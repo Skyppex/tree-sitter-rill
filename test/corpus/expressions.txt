@@ -1,0 +1,152 @@
+================================================================================
+Precedence
+================================================================================
+
+fn f() -> bool { 1 + 2 * 3 < 4 && true || !false }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (binary_expression
+          (binary_expression
+            (binary_expression
+              (binary_expression
+                (number
+                  (integer))
+                (binary_expression
+                  (number
+                    (integer))
+                  (number
+                    (integer))))
+              (number
+                (integer)))
+            (boolean))
+          (unary_expression
+            (boolean)))))))
+
+================================================================================
+Numbers and units
+================================================================================
+
+fn f() -> f32 {
+  [440Hz, 0.5Hz, 2kHz, 300ms, 2s, +7st, 50cents, 48_000, 1e-3, 2.5E+2, 3/2]
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (frame
+          (number
+            (integer)
+            (unit))
+          (number
+            (float)
+            (unit))
+          (number
+            (integer)
+            (unit))
+          (number
+            (integer)
+            (unit))
+          (number
+            (integer)
+            (unit))
+          (unary_expression
+            (number
+              (integer)
+              (unit)))
+          (number
+            (integer)
+            (unit))
+          (number
+            (integer))
+          (number
+            (float))
+          (number
+            (float))
+          (binary_expression
+            (number
+              (integer))
+            (number
+              (integer))))))))
+
+================================================================================
+Unary, index and calls
+================================================================================
+
+fn f() -> sample { -pan(mix_down(ducked)[0], -0.5)[1] % 2 }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (binary_expression
+          (unary_expression
+            (index_expression
+              (call_expression
+                (identifier)
+                (arguments
+                  (argument
+                    (index_expression
+                      (call_expression
+                        (identifier)
+                        (arguments
+                          (argument
+                            (identifier))))
+                      (number
+                        (integer))))
+                  (argument
+                    (unary_expression
+                      (number
+                        (float))))))
+              (number
+                (integer))))
+          (number
+            (integer)))))))
+
+================================================================================
+Pipes bind loosest
+================================================================================
+
+fn f() -> sample { x + 1 |> abs |> peak(release: 10ms) }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (pipe_expression
+          (pipe_expression
+            (binary_expression
+              (identifier)
+              (number
+                (integer)))
+            (identifier))
+          (identifier)
+          (arguments
+            (argument
+              (identifier)
+              (number
+                (integer)
+                (unit)))))))))

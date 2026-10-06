@@ -1,0 +1,252 @@
+================================================================================
+Minus at the start of a line begins a new statement
+================================================================================
+
+rill main() -> sample {
+  let a = 1
+  -2
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (number
+          (integer)))
+      (expression_statement
+        (unary_expression
+          (number
+            (integer)))))))
+
+================================================================================
+Line breaks inside parentheses are ignored
+================================================================================
+
+rill main() -> sample {
+  let a = (1
+  - 2)
+  return a
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (parenthesized_expression
+          (binary_expression
+            (number
+              (integer))
+            (number
+              (integer)))))
+      (return_statement
+        (identifier)))))
+
+================================================================================
+Pipes continue across lines
+================================================================================
+
+rill main() -> sample {
+  let b = a
+    |> f
+    // a comment between stages
+    |> g(release: 10ms,)
+  b
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (pipe_expression
+          (pipe_expression
+            (identifier)
+            (identifier))
+          (line_comment)
+          (identifier)
+          (arguments
+            (argument
+              (identifier)
+              (number
+                (integer)
+                (unit))))))
+      (expression_statement
+        (identifier)))))
+
+================================================================================
+Else may start a line
+================================================================================
+
+rill main() -> sample {
+  let a = if true { 1 }
+  else if false { 2 }
+  else { 3 }
+  elsewhere
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (if_expression
+          (boolean)
+          (block
+            (expression_statement
+              (number
+                (integer))))
+          (if_expression
+            (boolean)
+            (block
+              (expression_statement
+                (number
+                  (integer))))
+            (block
+              (expression_statement
+                (number
+                  (integer)))))))
+      (expression_statement
+        (identifier)))))
+
+================================================================================
+Semicolons separate statements on one line
+================================================================================
+
+rill main() -> sample {
+  let a = 1; let b: f32 = 2; state c = 3;
+  a = b; return a
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (number
+          (integer)))
+      (let_statement
+        (identifier)
+        (type_identifier)
+        (number
+          (integer)))
+      (state_statement
+        (identifier)
+        (number
+          (integer)))
+      (assignment
+        (identifier)
+        (identifier))
+      (return_statement
+        (identifier)))))
+
+================================================================================
+Two statements on one line without a semicolon
+:error
+================================================================================
+
+rill main() -> sample {
+  let a = 1 let b = 2
+}
+
+--------------------------------------------------------------------------------
+
+
+
+================================================================================
+Call and index arguments must start on the same line
+================================================================================
+
+rill main() -> sample {
+  f
+  (x)
+  a
+  [1]
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (identifier))
+      (expression_statement
+        (parenthesized_expression
+          (identifier)))
+      (expression_statement
+        (identifier))
+      (expression_statement
+        (frame
+          (number
+            (integer)))))))
+
+================================================================================
+Nested block expressions
+================================================================================
+
+rill main() -> sample {
+  let x = f({
+    let y = 2
+    y * 2
+  })
+  { x }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (block
+                (let_statement
+                  (identifier)
+                  (number
+                    (integer)))
+                (expression_statement
+                  (binary_expression
+                    (identifier)
+                    (number
+                      (integer)))))))))
+      (expression_statement
+        (block
+          (expression_statement
+            (identifier)))))))

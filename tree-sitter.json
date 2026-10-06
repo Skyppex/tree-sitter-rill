@@ -1,0 +1,39 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "rill",
+      "camelcase": "Rill",
+      "title": "Rill",
+      "scope": "source.rill",
+      "file-types": ["rill"],
+      "injection-regex": "^rill$",
+      "class-name": "TreeSitterRill",
+      "highlights": "queries/highlights.scm",
+      "locals": "queries/locals.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Rill grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Brage Ingebrigtsen",
+        "email": "brage.ingebrigtsen@hent.no"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/tree-sitter/tree-sitter-rill"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": false,
+    "python": false,
+    "rust": true,
+    "swift": false,
+    "zig": false
+  }
+}
