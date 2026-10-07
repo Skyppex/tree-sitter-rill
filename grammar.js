@@ -79,7 +79,7 @@ export default grammar({
 
     rill_definition: $ => prec.right(seq('rill', optional($._definition))),
 
-    // Everything is optional so `rill`, `rill foo(` and `rill foo() -> sample`
+    // Everything is optional so `rill`, `rill foo(` and `rill foo() Sample`
     // already give a definition node while it is being written.
     _definition: $ => prec.right(choice(
       seq(
@@ -99,7 +99,9 @@ export default grammar({
 
     _after_size_parameters: $ => prec.right(choice(
       seq(field('parameters', $.parameters), optional($._after_parameters)),
-      $._after_parameters,
+      // Without `->` a return type is only recognised after the parameters;
+      // `fn Sample` is a name.
+      $._after_return,
     )),
 
     _after_parameters: $ => prec.right(choice(
@@ -107,7 +109,8 @@ export default grammar({
       $._after_return,
     )),
 
-    _return: $ => prec.right(seq('->', optional(field('return_type', $._type)))),
+    // The return type follows the parameters directly: `rill foo() Sample`.
+    _return: $ => field('return_type', $._type),
 
     _after_return: $ => prec.right(choice(
       seq(field('rate', $.rate), optional(field('body', $.block))),

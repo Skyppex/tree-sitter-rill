@@ -2,7 +2,7 @@
 Function definition
 ================================================================================
 
-fn abs(x: sample) -> sample {
+fn abs(x: sample) sample {
     if x < 0 { -x } else { x }
 }
 
@@ -35,7 +35,7 @@ fn abs(x: sample) -> sample {
 Rill with defaults and state
 ================================================================================
 
-rill peak(x: sample, release: Time = 300ms,) -> sample {
+rill peak(x: sample, release: Time = 300ms,) sample {
     state level: sample = 0
     let a = abs(x)
     level = if a > level { a } else { level * decay(release) }
@@ -96,7 +96,7 @@ rill peak(x: sample, release: Time = 300ms,) -> sample {
 Size parameters and frame types
 ================================================================================
 
-rill mix_down<N, M,>(x: [sample; N], y: [[f32; 2]; M]) -> [sample; 1] {
+rill mix_down<N, M,>(x: [sample; N], y: [[f32; 2]; M]) [sample; 1] {
     return [sum(x) / N]
 }
 
@@ -139,9 +139,9 @@ rill mix_down<N, M,>(x: [sample; N], y: [[f32; 2]; M]) -> [sample; 1] {
 Rate specifications
 ================================================================================
 
-rill decimate(x: sample) -> sample @ rate / 2 { return x }
-rill upsample(x: sample) -> sample @ rate * 4 { return x }
-rill same(x: sample) -> sample @ rate { return x }
+rill decimate(x: sample) sample @ rate / 2 { return x }
+rill upsample(x: sample) sample @ rate * 4 { return x }
+rill same(x: sample) sample @ rate { return x }
 
 --------------------------------------------------------------------------------
 
@@ -186,7 +186,7 @@ rill same(x: sample) -> sample @ rate { return x }
 Rate is only a keyword after @
 ================================================================================
 
-rill f(rate: f32) -> sample { return rate * RATE }
+rill f(rate: f32) sample { return rate * RATE }
 
 --------------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@ event note_on(note)
 event control_change(control, cc,);
 event tick
 event bang()
-rill main() -> sample { return 0 }
+rill main() sample { return 0 }
 
 --------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ rill main() -> sample { return 0 }
 Event handlers
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   state gain = 0.0
 
   on note_on(note) {
@@ -97,7 +97,7 @@ rill main() -> sample {
 Event handlers nest in blocks
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   if ready {
     on note_on(note) { pitch = note.pitch }
   }
@@ -134,7 +134,7 @@ rill main() -> sample {
 Event keywords are plain names elsewhere
 ================================================================================
 
-rill main(event: f32, on: f32) -> sample {
+rill main(event: f32, on: f32) sample {
   let x = on + event
   on = 2
   on * 3
@@ -183,7 +183,7 @@ rill main(event: f32, on: f32) -> sample {
 Field access
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = control.index == 74
   let b = frames[0].left.value
   let c = -note.pitch |> tuning
@@ -238,7 +238,7 @@ Field access must start on the same line
 :error
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = note
     .pitch
 }

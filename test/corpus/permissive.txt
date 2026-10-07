@@ -55,8 +55,8 @@ return x
 Definitions and events inside blocks
 ================================================================================
 
-rill main() -> sample {
-  fn helper(x: sample) -> sample { x }
+rill main() sample {
+  fn helper(x: sample) sample { x }
   event local(a)
   return helper(1)
 }
@@ -101,9 +101,9 @@ fn abs
 rill peak(
 rill peak(x: sample,
 rill peak(x: sample, release: Time =
-rill sine(freq: Hz) ->
-rill sine(freq: Hz) -> sample @
-rill sine(freq: Hz) -> sample {
+rill sine(freq: Hz)
+rill sine(freq: Hz) sample @
+rill sine(freq: Hz) sample {
 
 --------------------------------------------------------------------------------
 
@@ -114,9 +114,9 @@ Definitions with missing pieces
 ================================================================================
 
 rill foo { return 0 }
-fn (x: f32) -> f32 { x }
+fn (x: f32) f32 { x }
 rill bar() sample { 1 }
-rill baz<N, M,> -> [sample; ] @ rate / { 1 }
+rill baz<N, M,>() [sample; ] @ rate / { 1 }
 
 --------------------------------------------------------------------------------
 
@@ -138,10 +138,8 @@ rill baz<N, M,> -> [sample; ] @ rate / { 1 }
         (identifier))))
   (rill_definition
     (identifier)
-    (parameters))
-  (expression_statement
-    (identifier))
-  (expression_statement
+    (parameters)
+    (type_identifier)
     (block
       (expression_statement
         (number
@@ -151,6 +149,7 @@ rill baz<N, M,> -> [sample; ] @ rate / { 1 }
     (size_parameters
       (identifier)
       (identifier))
+    (parameters)
     (frame_type
       (type_identifier))
     (rate)
@@ -163,7 +162,7 @@ rill baz<N, M,> -> [sample; ] @ rate / { 1 }
 Statements being typed
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let
   let x
   let x:
@@ -215,7 +214,7 @@ rill main() -> sample {
 Brace on the next line
 ================================================================================
 
-rill main() -> sample
+rill main() sample
 {
   if ready
   {
@@ -251,7 +250,7 @@ rill main() -> sample
 Expressions being typed
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   f(a, , b,)
   f(release:)
   x[]
@@ -301,7 +300,7 @@ rill main() -> sample {
 Assignment to any expression
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   note.pitch = A4
   frame[0] = 1
 }
@@ -331,7 +330,7 @@ rill main() -> sample {
 Statements without separators
 ================================================================================
 
-rill main() -> sample { let a = 1 let b = 2 a = b return a }
+rill main() sample { let a = 1 let b = 2 a = b return a }
 
 --------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@ Line and nested block comments
 ================================================================================
 
 // leading
-rill f(x: sample) -> sample { x |> g /* c /* nested */ */ } // end
+rill f(x: sample) sample { x |> g /* c /* nested */ */ } // end
 
 --------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ rill f(x: sample) -> sample { x |> g /* c /* nested */ */ } // end
 A comment spanning lines ends a statement
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = 1 /* spans
   lines */ let b = 2
   let c = 3 /* same line */

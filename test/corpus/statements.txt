@@ -2,7 +2,7 @@
 Minus at the start of a line begins a new statement
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = 1
   -2
 }
@@ -28,7 +28,7 @@ rill main() -> sample {
 Line breaks inside parentheses are ignored
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = (1
   - 2)
   return a
@@ -57,7 +57,7 @@ rill main() -> sample {
 Pipes continue across lines
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let b = a
     |> f
     // a comment between stages
@@ -94,7 +94,7 @@ rill main() -> sample {
 Else may start a line
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = if true { 1 }
   else if false { 2 }
   else { 3 }
@@ -134,7 +134,7 @@ rill main() -> sample {
 Semicolons separate statements on one line
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = 1; let b: f32 = 2; state c = 3;
   a = b; return a
 }
@@ -170,7 +170,7 @@ rill main() -> sample {
 Two statements on one line without a semicolon
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let a = 1 let b = 2
 }
 
@@ -195,7 +195,7 @@ rill main() -> sample {
 Call and index arguments must start on the same line
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   f
   (x)
   a
@@ -226,7 +226,7 @@ rill main() -> sample {
 Nested block expressions
 ================================================================================
 
-rill main() -> sample {
+rill main() sample {
   let x = f({
     let y = 2
     y * 2
