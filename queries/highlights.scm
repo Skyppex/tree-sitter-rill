@@ -9,7 +9,7 @@
 
 ((type_identifier) @type.builtin
   (#any-of? @type.builtin
-    "sample" "f32" "i32" "bool" "Hz" "Time" "Interval" "Pitch" "Chord"))
+    "Sample" "Float" "Int" "Bool" "Freq" "Pitch" "Time" "Interval" "Gain"))
 
 (size_parameters (identifier) @type.parameter)
 (frame_type size: (identifier) @type.parameter)
@@ -56,6 +56,8 @@
 ] @keyword
 
 "return" @keyword.return
+
+"as" @keyword.operator
 
 [
   "if"

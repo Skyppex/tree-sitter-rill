@@ -127,15 +127,16 @@ rill baz<N, M,>() [sample; ] @ rate / { 1 }
       (return_statement
         (number
           (integer)))))
-  (function_definition
-    (parameters
-      (parameter
-        (identifier)
-        (type_identifier)))
-    (type_identifier)
-    (block
-      (expression_statement
-        (identifier))))
+  (expression_statement
+    (function
+      (parameters
+        (parameter
+          (identifier)
+          (type_identifier)))
+      (type_identifier)
+      (block
+        (expression_statement
+          (identifier)))))
   (rill_definition
     (identifier)
     (parameters)

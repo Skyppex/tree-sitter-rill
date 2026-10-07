@@ -1,0 +1,225 @@
+================================================================================
+Function types
+================================================================================
+
+rill voice(pitch: Pitch, tune: fn(Pitch) Freq) Sample { return 0 }
+fn tuned(steps: Int) fn(Pitch) Freq { fn(p) { equal(p, steps) } }
+fn apply(f: fn(Sample, Float,) [Sample; 2]) Bool { true }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (function_type
+          (parameter_types
+            (type_identifier))
+          (type_identifier))))
+    (type_identifier)
+    (block
+      (return_statement
+        (number
+          (integer)))))
+  (function_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (function_type
+      (parameter_types
+        (type_identifier))
+      (type_identifier))
+    (block
+      (expression_statement
+        (function
+          (parameters
+            (parameter
+              (identifier)))
+          (block
+            (expression_statement
+              (call_expression
+                (identifier)
+                (arguments
+                  (argument
+                    (identifier))
+                  (argument
+                    (identifier))))))))))
+  (function_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (function_type
+          (parameter_types
+            (type_identifier)
+            (type_identifier))
+          (frame_type
+            (type_identifier)
+            (integer)))))
+    (type_identifier)
+    (block
+      (expression_statement
+        (boolean)))))
+
+================================================================================
+Anonymous fns
+================================================================================
+
+rill main() Sample {
+  let a = fn(p: Pitch) Freq { equal(p, 24, a4: 442Hz) }
+  let b = fn(p) { p }
+  let c: fn(Pitch) Freq = fn(p) { just(p, C) }
+  return sin(E4 |> a / RATE)
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (function
+          (parameters
+            (parameter
+              (identifier)
+              (type_identifier)))
+          (type_identifier)
+          (block
+            (expression_statement
+              (call_expression
+                (identifier)
+                (arguments
+                  (argument
+                    (identifier))
+                  (argument
+                    (number
+                      (integer)))
+                  (argument
+                    (identifier)
+                    (number
+                      (integer)
+                      (unit)))))))))
+      (let_statement
+        (identifier)
+        (function
+          (parameters
+            (parameter
+              (identifier)))
+          (block
+            (expression_statement
+              (identifier)))))
+      (let_statement
+        (identifier)
+        (function_type
+          (parameter_types
+            (type_identifier))
+          (type_identifier))
+        (function
+          (parameters
+            (parameter
+              (identifier)))
+          (block
+            (expression_statement
+              (call_expression
+                (identifier)
+                (arguments
+                  (argument
+                    (identifier))
+                  (argument
+                    (identifier))))))))
+      (return_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (binary_expression
+                (pipe_expression
+                  (identifier)
+                  (identifier))
+                (identifier)))))))))
+
+================================================================================
+Anonymous fns being typed
+:error
+================================================================================
+
+rill main() Sample {
+  let a = fn(
+  let c = fn(p) Freq
+  return 0
+}
+
+--------------------------------------------------------------------------------
+
+
+
+================================================================================
+Casts
+================================================================================
+
+fn f(x: Sample, n: Float) Int {
+  -x as Float * 2 as Int + n as Sample as Int
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (expression_statement
+        (binary_expression
+          (binary_expression
+            (cast_expression
+              (unary_expression
+                (identifier))
+              (type_identifier))
+            (cast_expression
+              (number
+                (integer))
+              (type_identifier)))
+          (cast_expression
+            (cast_expression
+              (identifier)
+              (type_identifier))
+            (type_identifier)))))))
+
+================================================================================
+Casts being typed
+================================================================================
+
+fn f(x: Sample) Int { x as }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (expression_statement
+        (cast_expression
+          (identifier))))))

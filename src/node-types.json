@@ -20,11 +20,19 @@
         "named": true
       },
       {
+        "type": "cast_expression",
+        "named": true
+      },
+      {
         "type": "field_expression",
         "named": true
       },
       {
         "type": "frame",
+        "named": true
+      },
+      {
+        "type": "function",
         "named": true
       },
       {
@@ -105,6 +113,10 @@
     "subtypes": [
       {
         "type": "frame_type",
+        "named": true
+      },
+      {
+        "type": "function_type",
         "named": true
       },
       {
@@ -311,6 +323,32 @@
     }
   },
   {
+    "type": "cast_expression",
+    "named": true,
+    "fields": {
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_type",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "event_declaration",
     "named": true,
     "fields": {
@@ -474,6 +512,42 @@
     }
   },
   {
+    "type": "function",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "block",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameters",
+            "named": true
+          }
+        ]
+      },
+      "return_type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "function_definition",
     "named": true,
     "fields": {
@@ -489,7 +563,7 @@
       },
       "name": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "identifier",
@@ -533,6 +607,32 @@
         "types": [
           {
             "type": "size_parameters",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "function_type",
+    "named": true,
+    "fields": {
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_types",
+            "named": true
+          }
+        ]
+      },
+      "return_type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_type",
             "named": true
           }
         ]
@@ -705,6 +805,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "parameter_types",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "_type",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1076,6 +1191,10 @@
   },
   {
     "type": "]",
+    "named": false
+  },
+  {
+    "type": "as",
     "named": false
   },
   {

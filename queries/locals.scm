@@ -3,6 +3,7 @@
 (function_definition) @local.scope
 (rill_definition) @local.scope
 (block) @local.scope
+(function) @local.scope
 (event_handler) @local.scope
 
 ; Definitions

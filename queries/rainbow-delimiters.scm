@@ -10,6 +10,10 @@
   "<" @delimiter
   ">" @delimiter @sentinel) @container
 
+(parameter_types
+  "(" @delimiter
+  ")" @delimiter @sentinel) @container
+
 (event_parameters
   "(" @delimiter
   ")" @delimiter @sentinel) @container

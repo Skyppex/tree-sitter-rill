@@ -24,8 +24,9 @@ const PREC = {
   compare: 4,
   sum: 5,
   term: 6,
-  unary: 7,
-  postfix: 8,
+  cast: 7,
+  unary: 8,
+  postfix: 9,
 };
 
 export default grammar({
@@ -51,7 +52,7 @@ export default grammar({
   // This lets error recovery restart at the next definition or statement
   // instead of reading e.g. `rill` as a parameter name after an unclosed `(`.
   reserved: {
-    global: _ => ['fn', 'rill', 'let', 'state', 'return', 'if', 'else', 'true', 'false'],
+    global: _ => ['fn', 'rill', 'let', 'state', 'return', 'if', 'else', 'as', 'true', 'false'],
   },
 
   supertypes: $ => [$._statement, $._expression, $._type],
@@ -75,7 +76,12 @@ export default grammar({
 
     // ---- definitions ------------------------------------------------------
 
-    function_definition: $ => prec.right(seq('fn', optional($._definition))),
+    // A named fn. Without a name, `fn(...)` is an anonymous fn (`function`).
+    function_definition: $ => prec.right(seq(
+      'fn',
+      field('name', $.identifier),
+      optional($._signature),
+    )),
 
     rill_definition: $ => prec.right(seq('rill', optional($._definition))),
 
@@ -156,7 +162,20 @@ export default grammar({
 
     // ---- types ------------------------------------------------------------
 
-    _type: $ => choice(alias($.identifier, $.type_identifier), $.frame_type),
+    _type: $ => choice(
+      alias($.identifier, $.type_identifier),
+      $.frame_type,
+      $.function_type,
+    ),
+
+    // `fn(Pitch) Freq`
+    function_type: $ => prec.right(seq(
+      'fn',
+      field('parameters', $.parameter_types),
+      optional(field('return_type', $._type)),
+    )),
+
+    parameter_types: $ => seq('(', repeat(choice($._type, ',')), ')'),
 
     frame_type: $ => seq(
       '[',
@@ -204,6 +223,7 @@ export default grammar({
       $.identifier,
       $.unary_expression,
       $.binary_expression,
+      $.cast_expression,
       $.pipe_expression,
       $.call_expression,
       $.index_expression,
@@ -211,8 +231,17 @@ export default grammar({
       $.parenthesized_expression,
       $.frame,
       $.if_expression,
+      $.function,
       $.block,
     ),
+
+    // An anonymous fn: `fn(p) { ... }`, `fn(p: Pitch) Freq { ... }`.
+    function: $ => prec.right(seq(
+      'fn',
+      field('parameters', $.parameters),
+      optional(field('return_type', $._type)),
+      optional(field('body', $.block)),
+    )),
 
     // `x |> f` and `x |> f(a)`, sugar for `f(x)` and `f(x, a)`.
     pipe_expression: $ => prec.left(PREC.pipe, seq(
@@ -243,6 +272,17 @@ export default grammar({
         field('right', $._expression),
       ))));
     },
+
+    // `x as Float`. While being typed the type may be missing; that form is
+    // right-associative so a type that follows is always taken.
+    cast_expression: $ => choice(
+      prec.left(PREC.cast, seq(
+        field('value', $._expression),
+        'as',
+        field('type', $._type),
+      )),
+      prec.right(PREC.cast, seq(field('value', $._expression), 'as')),
+    ),
 
     unary_expression: $ => prec(PREC.unary, seq(
       field('operator', choice('-', '+', '!')),
