@@ -1,0 +1,80 @@
+================================================================================
+Nested frames
+================================================================================
+
+rill main(x: [[Sample; 2]; N]) [Sample; 2] {
+  state buses: [[Sample; 2]; 4] = [[0, 0], [0, 0], [0, 0], [0, 0]]
+  let one = buses[1][0]
+  return sum(buses * [0.5, 1, 1, 0.2])
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (frame_type
+          (frame_type
+            (type_identifier)
+            (integer))
+          (identifier))))
+    (frame_type
+      (type_identifier)
+      (integer))
+    (block
+      (state_statement
+        (identifier)
+        (frame_type
+          (frame_type
+            (type_identifier)
+            (integer))
+          (integer))
+        (frame
+          (frame
+            (number
+              (integer))
+            (number
+              (integer)))
+          (frame
+            (number
+              (integer))
+            (number
+              (integer)))
+          (frame
+            (number
+              (integer))
+            (number
+              (integer)))
+          (frame
+            (number
+              (integer))
+            (number
+              (integer)))))
+      (let_statement
+        (identifier)
+        (index_expression
+          (index_expression
+            (identifier)
+            (number
+              (integer)))
+          (number
+            (integer))))
+      (return_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (binary_expression
+                (identifier)
+                (frame
+                  (number
+                    (float))
+                  (number
+                    (integer))
+                  (number
+                    (integer))
+                  (number
+                    (float)))))))))))
