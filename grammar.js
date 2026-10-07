@@ -6,8 +6,18 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
+// This grammar is deliberately more permissive than the compiler. It exists
+// for highlighting and editor tooling, so it should give a useful tree for
+// code that is half-written or in the wrong place: any statement may appear
+// at the top level or in any block, separators between statements are
+// optional, and most parts of a construct after its leading keyword are
+// optional. The compiler and LSP report what is actually wrong.
+
 // Mirrors the precedence levels in src/lang/parser.rs, lowest first.
 const PREC = {
+  statement: -1,
+  if: 1,
+  assign: 0,
   pipe: 1,
   or: 2,
   and: 3,
@@ -21,94 +31,41 @@ const PREC = {
 export default grammar({
   name: 'rill',
 
-  // Statements end at a line break or `;`. The scanner decides when a line
-  // break ends a statement (see src/scanner.c).
-  // `on` is only a keyword when a name follows, so `on = 1` still assigns to
-  // a variable called `on`; the scanner checks that too.
-  externals: $ => [$._newline, $.block_comment, $._on, $._error_sentinel],
+  // - `_newline`: a line break where it separates statements; the scanner
+  //   decides when a line break does that (see src/scanner.c).
+  // - `_on` and `_event` are keywords only when a name follows, so they stay
+  //   usable as variable names.
+  externals: $ => [
+    $._newline,
+    $.block_comment,
+    $._on,
+    $._event,
+    $._error_sentinel,
+  ],
 
   extras: $ => [/\s/, $.line_comment, $.block_comment],
 
   word: $ => $.identifier,
 
-  supertypes: $ => [$._item, $._statement, $._expression, $._type],
+  // Always keywords, as in the compiler's lexer, even where a name would fit.
+  // This lets error recovery restart at the next definition or statement
+  // instead of reading e.g. `rill` as a parameter name after an unclosed `(`.
+  reserved: {
+    global: _ => ['fn', 'rill', 'let', 'state', 'return', 'if', 'else', 'true', 'false'],
+  },
+
+  supertypes: $ => [$._statement, $._expression, $._type],
 
   rules: {
-    source_file: $ => repeat($._item),
+    source_file: $ => repeat($._statement_or_separator),
 
-    _item: $ => choice(
+    _statement_or_separator: $ => choice($._statement, ';', $._newline),
+
+    _statement: $ => choice(
       $.function_definition,
       $.rill_definition,
       $.event_declaration,
-    ),
-
-    function_definition: $ => seq('fn', $._definition),
-
-    rill_definition: $ => seq('rill', $._definition),
-
-    _definition: $ => seq(
-      field('name', $.identifier),
-      optional(field('size_parameters', $.size_parameters)),
-      field('parameters', $.parameters),
-      '->',
-      field('return_type', $._type),
-      optional(field('rate', $.rate)),
-      field('body', $.block),
-    ),
-
-    // `event note_on(note)`. Items start with a keyword, so unlike
-    // statements no line break is needed to end one.
-    event_declaration: $ => seq(
-      'event',
-      field('name', $.identifier),
-      optional(field('parameters', $.event_parameters)),
-      optional(';'),
-    ),
-
-    event_parameters: $ => seq('(', commaSep($.identifier), optional(','), ')'),
-
-    size_parameters: $ => seq('<', commaSep1($.identifier), optional(','), '>'),
-
-    parameters: $ => seq('(', commaSep($.parameter), optional(','), ')'),
-
-    parameter: $ => seq(
-      field('name', $.identifier),
-      ':',
-      field('type', $._type),
-      optional(seq('=', field('default', $._expression))),
-    ),
-
-    // `@ rate`, `@ rate / 2`, `@ rate * 2`
-    rate: $ => seq(
-      '@',
-      'rate',
-      optional(seq(
-        field('operator', choice('*', '/')),
-        field('factor', $.integer),
-      )),
-    ),
-
-    _type: $ => choice(alias($.identifier, $.type_identifier), $.frame_type),
-
-    frame_type: $ => seq(
-      '[',
-      field('element', $._type),
-      ';',
-      field('size', choice($.integer, $.identifier)),
-      ']',
-    ),
-
-    // An event handler needs no terminator after its `}`, as in the compiler.
-    block: $ => seq(
-      '{',
-      repeat(choice(seq($._statement, $._terminator), $.event_handler)),
-      optional($._statement),
-      '}',
-    ),
-
-    _terminator: $ => choice(';', $._newline),
-
-    _statement: $ => choice(
+      $.event_handler,
       $.let_statement,
       $.state_statement,
       $.assignment,
@@ -116,39 +73,127 @@ export default grammar({
       $.expression_statement,
     ),
 
-    let_statement: $ => seq(
-      'let',
-      field('name', $.identifier),
-      optional(seq(':', field('type', $._type))),
-      '=',
-      field('value', $._expression),
-    ),
+    // ---- definitions ------------------------------------------------------
 
-    state_statement: $ => seq(
-      'state',
-      field('name', $.identifier),
-      optional(seq(':', field('type', $._type))),
-      '=',
-      field('value', $._expression),
-    ),
+    function_definition: $ => prec.right(seq('fn', optional($._definition))),
 
-    assignment: $ => seq(
-      field('target', $.identifier),
-      '=',
-      field('value', $._expression),
-    ),
+    rill_definition: $ => prec.right(seq('rill', optional($._definition))),
+
+    // Everything is optional so `rill`, `rill foo(` and `rill foo() -> sample`
+    // already give a definition node while it is being written.
+    _definition: $ => prec.right(choice(
+      seq(
+        field('name', $.identifier),
+        optional($._signature),
+      ),
+      $._signature,
+    )),
+
+    _signature: $ => prec.right(choice(
+      seq(
+        field('size_parameters', $.size_parameters),
+        optional($._after_size_parameters),
+      ),
+      $._after_size_parameters,
+    )),
+
+    _after_size_parameters: $ => prec.right(choice(
+      seq(field('parameters', $.parameters), optional($._after_parameters)),
+      $._after_parameters,
+    )),
+
+    _after_parameters: $ => prec.right(choice(
+      seq($._return, optional($._after_return)),
+      $._after_return,
+    )),
+
+    _return: $ => prec.right(seq('->', optional(field('return_type', $._type)))),
+
+    _after_return: $ => prec.right(choice(
+      seq(field('rate', $.rate), optional(field('body', $.block))),
+      field('body', $.block),
+    )),
+
+    size_parameters: $ => seq('<', repeat(choice($.identifier, ',')), '>'),
+
+    parameters: $ => seq('(', repeat(choice($.parameter, ',')), ')'),
+
+    parameter: $ => prec.right(seq(
+      field('name', $.identifier),
+      optional(seq(':', optional(field('type', $._type)))),
+      optional(seq('=', optional(field('default', $._expression)))),
+    )),
+
+    // `@ rate`, `@ rate / 2`, `@ rate * 2`
+    rate: $ => prec.right(seq(
+      '@',
+      optional('rate'),
+      optional(seq(
+        field('operator', choice('*', '/')),
+        optional(field('factor', $.integer)),
+      )),
+    )),
+
+    // `event note_on(note)`
+    event_declaration: $ => prec.right(seq(
+      alias($._event, 'event'),
+      field('name', $.identifier),
+      optional(field('parameters', $.event_parameters)),
+    )),
 
     // `on note_on(note) { ... }`
-    event_handler: $ => seq(
+    event_handler: $ => prec.right(seq(
       alias($._on, 'on'),
       field('event', $.identifier),
       optional(field('parameters', $.event_parameters)),
-      field('body', $.block),
+      optional(field('body', $.block)),
+    )),
+
+    event_parameters: $ => seq('(', repeat(choice($.identifier, ',')), ')'),
+
+    // ---- types ------------------------------------------------------------
+
+    _type: $ => choice(alias($.identifier, $.type_identifier), $.frame_type),
+
+    frame_type: $ => seq(
+      '[',
+      optional(field('element', $._type)),
+      optional(seq(';', optional(field('size', choice($.integer, $.identifier))))),
+      ']',
     ),
 
-    return_statement: $ => seq('return', field('value', $._expression)),
+    // ---- statements -------------------------------------------------------
 
-    expression_statement: $ => $._expression,
+    block: $ => seq('{', repeat($._statement_or_separator), '}'),
+
+    let_statement: $ => prec.right(seq('let', optional($._binding))),
+
+    state_statement: $ => prec.right(seq('state', optional($._binding))),
+
+    _binding: $ => prec.right(choice(
+      seq(field('name', $.identifier), optional($._binding_rest)),
+      $._binding_rest,
+    )),
+
+    _binding_rest: $ => prec.right(choice(
+      seq(':', optional(field('type', $._type)), optional($._initializer)),
+      $._initializer,
+    )),
+
+    _initializer: $ => prec.right(seq('=', optional(field('value', $._expression)))),
+
+    // The compiler only assigns to names; any expression is accepted here.
+    assignment: $ => prec.right(PREC.assign, seq(
+      field('target', $._expression),
+      '=',
+      optional(field('value', $._expression)),
+    )),
+
+    return_statement: $ => prec.right(seq('return', optional(field('value', $._expression)))),
+
+    expression_statement: $ => prec(PREC.statement, $._expression),
+
+    // ---- expressions ------------------------------------------------------
 
     _expression: $ => choice(
       $.number,
@@ -170,6 +215,12 @@ export default grammar({
     pipe_expression: $ => prec.left(PREC.pipe, seq(
       field('input', $._expression),
       '|>',
+      $._pipe_target,
+    )),
+
+    // Separate so its arguments bind greedily: `x |> f(a)` passes `a` to `f`
+    // rather than ending the pipe at `f`.
+    _pipe_target: $ => prec.right(seq(
       field('function', $.identifier),
       optional(field('arguments', $.arguments)),
     )),
@@ -200,37 +251,37 @@ export default grammar({
       field('arguments', $.arguments),
     )),
 
-    arguments: $ => seq('(', commaSep($.argument), optional(','), ')'),
+    arguments: $ => seq('(', repeat(choice($.argument, ',')), ')'),
 
-    argument: $ => seq(
-      optional(seq(field('name', $.identifier), ':')),
+    argument: $ => prec.right(choice(
+      seq(field('name', $.identifier), ':', optional(field('value', $._expression))),
       field('value', $._expression),
-    ),
+    )),
 
     index_expression: $ => prec(PREC.postfix, seq(
       field('value', $._expression),
       '[',
-      field('index', $._expression),
+      optional(field('index', $._expression)),
       ']',
     )),
 
-    field_expression: $ => prec(PREC.postfix, seq(
+    field_expression: $ => prec.right(PREC.postfix, seq(
       field('value', $._expression),
       '.',
-      field('field', alias($.identifier, $.field_identifier)),
+      optional(field('field', alias($.identifier, $.field_identifier))),
     )),
 
-    parenthesized_expression: $ => seq('(', $._expression, ')'),
+    parenthesized_expression: $ => seq('(', optional($._expression), ')'),
 
-    frame: $ => seq('[', commaSep1($._expression), optional(','), ']'),
+    frame: $ => seq('[', repeat1(choice($._expression, ',')), ']'),
 
-    if_expression: $ => prec.right(seq(
+    if_expression: $ => prec.right(PREC.if, seq(
       'if',
-      field('condition', $._expression),
-      field('consequence', $.block),
+      optional(field('condition', $._expression)),
+      optional(field('consequence', $.block)),
       optional(seq(
         'else',
-        field('alternative', choice($.if_expression, $.block)),
+        optional(field('alternative', choice($.if_expression, $.block))),
       )),
     )),
 
@@ -256,17 +307,3 @@ export default grammar({
     line_comment: _ => token(seq('//', /[^\n]*/)),
   },
 });
-
-/**
- * @param {RuleOrLiteral} rule
- */
-function commaSep1(rule) {
-  return seq(rule, repeat(seq(',', rule)));
-}
-
-/**
- * @param {RuleOrLiteral} rule
- */
-function commaSep(rule) {
-  return optional(commaSep1(rule));
-}

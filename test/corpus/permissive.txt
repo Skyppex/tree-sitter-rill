@@ -1,0 +1,356 @@
+================================================================================
+Statements at the top level
+================================================================================
+
+let lfo = sine(0.5Hz) * 20Hz + 440Hz
+state x = 1
+out(voice)
+on note_on(note) { x = note.pitch }
+return x
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (let_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (number
+                (float)
+                (unit)))))
+        (number
+          (integer)
+          (unit)))
+      (number
+        (integer)
+        (unit))))
+  (state_statement
+    (identifier)
+    (number
+      (integer)))
+  (expression_statement
+    (call_expression
+      (identifier)
+      (arguments
+        (argument
+          (identifier)))))
+  (event_handler
+    (identifier)
+    (event_parameters
+      (identifier))
+    (block
+      (assignment
+        (identifier)
+        (field_expression
+          (identifier)
+          (field_identifier)))))
+  (return_statement
+    (identifier)))
+
+================================================================================
+Definitions and events inside blocks
+================================================================================
+
+rill main() -> sample {
+  fn helper(x: sample) -> sample { x }
+  event local(a)
+  return helper(1)
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (function_definition
+        (identifier)
+        (parameters
+          (parameter
+            (identifier)
+            (type_identifier)))
+        (type_identifier)
+        (block
+          (expression_statement
+            (identifier))))
+      (event_declaration
+        (identifier)
+        (event_parameters
+          (identifier)))
+      (return_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (number
+                (integer)))))))))
+
+================================================================================
+Definitions being typed
+:error
+================================================================================
+
+rill
+fn abs
+rill peak(
+rill peak(x: sample,
+rill peak(x: sample, release: Time =
+rill sine(freq: Hz) ->
+rill sine(freq: Hz) -> sample @
+rill sine(freq: Hz) -> sample {
+
+--------------------------------------------------------------------------------
+
+
+
+================================================================================
+Definitions with missing pieces
+================================================================================
+
+rill foo { return 0 }
+fn (x: f32) -> f32 { x }
+rill bar() sample { 1 }
+rill baz<N, M,> -> [sample; ] @ rate / { 1 }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (block
+      (return_statement
+        (number
+          (integer)))))
+  (function_definition
+    (parameters
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (expression_statement
+        (identifier))))
+  (rill_definition
+    (identifier)
+    (parameters))
+  (expression_statement
+    (identifier))
+  (expression_statement
+    (block
+      (expression_statement
+        (number
+          (integer)))))
+  (rill_definition
+    (identifier)
+    (size_parameters
+      (identifier)
+      (identifier))
+    (frame_type
+      (type_identifier))
+    (rate)
+    (block
+      (expression_statement
+        (number
+          (integer))))))
+
+================================================================================
+Statements being typed
+================================================================================
+
+rill main() -> sample {
+  let
+  let x
+  let x:
+  let x: f32 =
+  state level: sample
+  return
+  x =
+  if
+  if x
+  if x { 1 } else
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement)
+      (let_statement
+        (identifier))
+      (let_statement
+        (identifier))
+      (let_statement
+        (identifier)
+        (type_identifier))
+      (state_statement
+        (identifier)
+        (type_identifier))
+      (return_statement)
+      (assignment
+        (identifier))
+      (expression_statement
+        (if_expression))
+      (expression_statement
+        (if_expression
+          (identifier)))
+      (expression_statement
+        (if_expression
+          (identifier)
+          (block
+            (expression_statement
+              (number
+                (integer)))))))))
+
+================================================================================
+Brace on the next line
+================================================================================
+
+rill main() -> sample
+{
+  if ready
+  {
+    1
+  }
+  else
+  {
+    2
+  }
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (if_expression
+          (identifier)
+          (block
+            (expression_statement
+              (number
+                (integer))))
+          (block
+            (expression_statement
+              (number
+                (integer)))))))))
+
+================================================================================
+Expressions being typed
+================================================================================
+
+rill main() -> sample {
+  f(a, , b,)
+  f(release:)
+  x[]
+  note.
+  [1, , 2]
+  ()
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (identifier))
+            (argument
+              (identifier)))))
+      (expression_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (identifier)))))
+      (expression_statement
+        (index_expression
+          (identifier)))
+      (expression_statement
+        (field_expression
+          (identifier)))
+      (expression_statement
+        (frame
+          (number
+            (integer))
+          (number
+            (integer))))
+      (expression_statement
+        (parenthesized_expression)))))
+
+================================================================================
+Assignment to any expression
+================================================================================
+
+rill main() -> sample {
+  note.pitch = A4
+  frame[0] = 1
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (assignment
+        (field_expression
+          (identifier)
+          (field_identifier))
+        (identifier))
+      (assignment
+        (index_expression
+          (identifier)
+          (number
+            (integer)))
+        (number
+          (integer))))))
+
+================================================================================
+Statements without separators
+================================================================================
+
+rill main() -> sample { let a = 1 let b = 2 a = b return a }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (number
+          (integer)))
+      (let_statement
+        (identifier)
+        (number
+          (integer)))
+      (assignment
+        (identifier)
+        (identifier))
+      (return_statement
+        (identifier)))))

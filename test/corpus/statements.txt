@@ -168,7 +168,6 @@ rill main() -> sample {
 
 ================================================================================
 Two statements on one line without a semicolon
-:error
 ================================================================================
 
 rill main() -> sample {
@@ -177,7 +176,20 @@ rill main() -> sample {
 
 --------------------------------------------------------------------------------
 
-
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (number
+          (integer)))
+      (let_statement
+        (identifier)
+        (number
+          (integer))))))
 
 ================================================================================
 Call and index arguments must start on the same line

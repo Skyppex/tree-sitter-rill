@@ -1,16 +1,18 @@
 // External scanner for Rill.
 //
-// Three tokens need more than a regex:
+// These tokens need more than a regex:
 //
-// - `_newline` ends a statement at a line break. It is only produced where
-//   the grammar allows a statement terminator, which matches the compiler's
-//   rule that line breaks are ignored inside `(...)` and `[...]`. A line that
-//   starts with `|>` or `else` continues the previous one instead, so
-//   pipelines can be written one stage per line.
+// - `_newline` separates statements at a line break, so `a` followed by `-b`
+//   on the next line is two statements. It is only produced where the
+//   grammar allows a separator, which matches the compiler's rule that line
+//   breaks are ignored inside `(...)` and `[...]`. A line that starts with
+//   `|>`, `else` or `{` continues the previous one instead, so pipelines can
+//   be written one stage per line and braces can go on their own line.
 // - `block_comment` nests, as in `/* a /* b */ c */`.
-// - `on` starts an event handler only when a name follows, as in
-//   `on note_on(note) { ... }`. Elsewhere `on` is an ordinary name.
+// - `on` and `event` are keywords only when a name follows, as in
+//   `on note_on(note) { ... }`. Elsewhere they are ordinary names.
 
+#include "tree_sitter/alloc.h"
 #include "tree_sitter/parser.h"
 
 #include <stdbool.h>
@@ -20,16 +22,30 @@ enum TokenType {
   NEWLINE,
   BLOCK_COMMENT,
   ON,
+  EVENT,
   ERROR_SENTINEL,
 };
 
-void *tree_sitter_rill_external_scanner_create(void) { return NULL; }
+typedef struct {
+  // The last token was a block comment spanning lines, which separates
+  // statements like a line break.
+  bool comment_had_newline;
+} Scanner;
 
-void tree_sitter_rill_external_scanner_destroy(void *payload) {}
+void *tree_sitter_rill_external_scanner_create(void) { return ts_calloc(1, sizeof(Scanner)); }
 
-unsigned tree_sitter_rill_external_scanner_serialize(void *payload, char *buffer) { return 0; }
+void tree_sitter_rill_external_scanner_destroy(void *payload) { ts_free(payload); }
 
-void tree_sitter_rill_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
+unsigned tree_sitter_rill_external_scanner_serialize(void *payload, char *buffer) {
+  Scanner *scanner = payload;
+  buffer[0] = (char)scanner->comment_had_newline;
+  return 1;
+}
+
+void tree_sitter_rill_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
+  Scanner *scanner = payload;
+  scanner->comment_had_newline = length > 0 && buffer[0];
+}
 
 static void advance(TSLexer *lexer) { lexer->advance(lexer, false); }
 
@@ -95,6 +111,7 @@ static bool eat_word(TSLexer *lexer, const char *word) {
 // continues the previous line, looking past any comments in between.
 static bool continues_line(TSLexer *lexer) {
   if (!skip_trivia(lexer)) return false;
+  if (lexer->lookahead == '{') return true;
   if (lexer->lookahead == '|') {
     advance(lexer);
     return lexer->lookahead == '>';
@@ -106,9 +123,9 @@ static const char *const KEYWORDS[] = {
     "fn", "rill", "state", "let", "return", "if", "else", "true", "false",
 };
 
-// The lexer is at `on`. It is a keyword if a name, not a keyword, follows.
-static bool scan_on(TSLexer *lexer) {
-  if (!eat_word(lexer, "on")) return false;
+// Scan `keyword`, which counts as one only if a name, not a keyword, follows.
+static bool scan_contextual(TSLexer *lexer, const char *keyword) {
+  if (!eat_word(lexer, keyword)) return false;
   lexer->mark_end(lexer);
   if (!skip_trivia(lexer)) return false;
 
@@ -130,11 +147,13 @@ static bool scan_on(TSLexer *lexer) {
 }
 
 bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
+  Scanner *scanner = payload;
   // During error recovery every symbol is valid; only comments are safe to
   // produce then.
   bool want_newline = valid_symbols[NEWLINE] && !valid_symbols[ERROR_SENTINEL];
 
-  bool newline = false;
+  bool newline = scanner->comment_had_newline;
+  scanner->comment_had_newline = false;
   while (is_space(lexer->lookahead)) {
     if (lexer->lookahead == '\n') newline = true;
     skip(lexer);
@@ -147,26 +166,27 @@ bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const
   }
 
   if (valid_symbols[BLOCK_COMMENT] && lexer->lookahead == '/') {
-    // A comment spanning lines ends the statement like a line break would,
-    // so a `_newline` may have to come first. Mark it before the comment.
-    lexer->mark_end(lexer);
     advance(lexer);
     if (lexer->lookahead != '*') return false;
     advance(lexer);
     bool spans_lines = false;
     if (!finish_block_comment(lexer, &spans_lines)) return false;
-    if (spans_lines && want_newline) {
-      lexer->result_symbol = NEWLINE;
-      return !continues_line(lexer);
-    }
+    // Produce the `_newline` on the next scan, after the comment.
+    scanner->comment_had_newline = spans_lines;
     lexer->mark_end(lexer);
     lexer->result_symbol = BLOCK_COMMENT;
     return true;
   }
 
-  if (valid_symbols[ON] && !valid_symbols[ERROR_SENTINEL] && lexer->lookahead == 'o') {
-    lexer->result_symbol = ON;
-    return scan_on(lexer);
+  if (!valid_symbols[ERROR_SENTINEL]) {
+    if (valid_symbols[ON] && lexer->lookahead == 'o') {
+      lexer->result_symbol = ON;
+      return scan_contextual(lexer, "on");
+    }
+    if (valid_symbols[EVENT] && lexer->lookahead == 'e') {
+      lexer->result_symbol = EVENT;
+      return scan_contextual(lexer, "event");
+    }
   }
 
   return false;
