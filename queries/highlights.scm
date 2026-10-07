@@ -15,6 +15,7 @@
 (frame_type size: (identifier) @type.parameter)
 
 (parameter name: (identifier) @variable.parameter)
+(event_parameters (identifier) @variable.parameter)
 (argument name: (identifier) @variable.parameter)
 
 ; Definitions and calls
@@ -22,8 +23,13 @@
 (function_definition name: (identifier) @function)
 (rill_definition name: (identifier) @function)
 
+(event_declaration name: (identifier) @function)
+(event_handler event: (identifier) @function)
+
 (call_expression function: (identifier) @function.call)
 (pipe_expression function: (identifier) @function.call)
+
+(field_identifier) @property
 
 ; Literals
 
@@ -45,6 +51,8 @@
 [
   "let"
   "state"
+  "event"
+  "on"
 ] @keyword
 
 "return" @keyword.return
@@ -78,6 +86,8 @@
   "->"
   "@"
 ] @operator
+
+"." @punctuation.delimiter
 
 (size_parameters ["<" ">"] @punctuation.bracket)
 

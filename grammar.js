@@ -18,12 +18,14 @@ const PREC = {
   postfix: 8,
 };
 
-module.exports = grammar({
+export default grammar({
   name: 'rill',
 
   // Statements end at a line break or `;`. The scanner decides when a line
   // break ends a statement (see src/scanner.c).
-  externals: $ => [$._newline, $.block_comment, $._error_sentinel],
+  // `on` is only a keyword when a name follows, so `on = 1` still assigns to
+  // a variable called `on`; the scanner checks that too.
+  externals: $ => [$._newline, $.block_comment, $._on, $._error_sentinel],
 
   extras: $ => [/\s/, $.line_comment, $.block_comment],
 
@@ -34,7 +36,11 @@ module.exports = grammar({
   rules: {
     source_file: $ => repeat($._item),
 
-    _item: $ => choice($.function_definition, $.rill_definition),
+    _item: $ => choice(
+      $.function_definition,
+      $.rill_definition,
+      $.event_declaration,
+    ),
 
     function_definition: $ => seq('fn', $._definition),
 
@@ -49,6 +55,17 @@ module.exports = grammar({
       optional(field('rate', $.rate)),
       field('body', $.block),
     ),
+
+    // `event note_on(note)`. Items start with a keyword, so unlike
+    // statements no line break is needed to end one.
+    event_declaration: $ => seq(
+      'event',
+      field('name', $.identifier),
+      optional(field('parameters', $.event_parameters)),
+      optional(';'),
+    ),
+
+    event_parameters: $ => seq('(', commaSep($.identifier), optional(','), ')'),
 
     size_parameters: $ => seq('<', commaSep1($.identifier), optional(','), '>'),
 
@@ -81,9 +98,10 @@ module.exports = grammar({
       ']',
     ),
 
+    // An event handler needs no terminator after its `}`, as in the compiler.
     block: $ => seq(
       '{',
-      repeat(seq($._statement, $._terminator)),
+      repeat(choice(seq($._statement, $._terminator), $.event_handler)),
       optional($._statement),
       '}',
     ),
@@ -120,6 +138,14 @@ module.exports = grammar({
       field('value', $._expression),
     ),
 
+    // `on note_on(note) { ... }`
+    event_handler: $ => seq(
+      alias($._on, 'on'),
+      field('event', $.identifier),
+      optional(field('parameters', $.event_parameters)),
+      field('body', $.block),
+    ),
+
     return_statement: $ => seq('return', field('value', $._expression)),
 
     expression_statement: $ => $._expression,
@@ -133,6 +159,7 @@ module.exports = grammar({
       $.pipe_expression,
       $.call_expression,
       $.index_expression,
+      $.field_expression,
       $.parenthesized_expression,
       $.frame,
       $.if_expression,
@@ -185,6 +212,12 @@ module.exports = grammar({
       '[',
       field('index', $._expression),
       ']',
+    )),
+
+    field_expression: $ => prec(PREC.postfix, seq(
+      field('value', $._expression),
+      '.',
+      field('field', alias($.identifier, $.field_identifier)),
     )),
 
     parenthesized_expression: $ => seq('(', $._expression, ')'),
