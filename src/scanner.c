@@ -9,8 +9,12 @@
 //   `|>`, `else` or `{` continues the previous one instead, so pipelines can
 //   be written one stage per line and braces can go on their own line.
 // - `block_comment` nests, as in `/* a /* b */ c */`.
-// - `on` and `event` are keywords only when a name follows, as in
+// - `on`, `event` and `seq` are keywords only when a name follows, as in
 //   `on note_on(note) { ... }`. Elsewhere they are ordinary names.
+// - `invoke`, `trigger` and `halt` are keywords when a name or a number
+//   follows (`invoke riff`, `trigger 3 riff`).
+// - `claim` is a keyword before `{` or `(`, and `release` before `{`, as in
+//   `on keys(note) claim { ... }`.
 
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/parser.h"
@@ -23,6 +27,12 @@ enum TokenType {
   BLOCK_COMMENT,
   ON,
   EVENT,
+  SEQ,
+  INVOKE,
+  TRIGGER,
+  HALT,
+  CLAIM,
+  RELEASE,
   ERROR_SENTINEL,
 };
 
@@ -146,6 +156,24 @@ static bool scan_contextual(TSLexer *lexer, const char *keyword) {
   return true;
 }
 
+// Scan `keyword`, which counts as one only if a name or a number follows.
+// The operand must be on the same line, as in the compiler.
+static bool scan_before_operand(TSLexer *lexer, const char *keyword) {
+  if (!eat_word(lexer, keyword)) return false;
+  lexer->mark_end(lexer);
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') advance(lexer);
+  return is_ident_char(lexer->lookahead);
+}
+
+// Scan `keyword`, which counts as one only if `{` (or, with `paren`, `(`)
+// follows.
+static bool scan_before_brace(TSLexer *lexer, const char *keyword, bool paren) {
+  if (!eat_word(lexer, keyword)) return false;
+  lexer->mark_end(lexer);
+  if (!skip_trivia(lexer)) return false;
+  return lexer->lookahead == '{' || (paren && lexer->lookahead == '(');
+}
+
 bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
   Scanner *scanner = payload;
   // During error recovery every symbol is valid; only comments are safe to
@@ -186,6 +214,30 @@ bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const
     if (valid_symbols[EVENT] && lexer->lookahead == 'e') {
       lexer->result_symbol = EVENT;
       return scan_contextual(lexer, "event");
+    }
+    if (valid_symbols[SEQ] && lexer->lookahead == 's') {
+      lexer->result_symbol = SEQ;
+      return scan_contextual(lexer, "seq");
+    }
+    if (valid_symbols[INVOKE] && lexer->lookahead == 'i') {
+      lexer->result_symbol = INVOKE;
+      return scan_before_operand(lexer, "invoke");
+    }
+    if (valid_symbols[TRIGGER] && lexer->lookahead == 't') {
+      lexer->result_symbol = TRIGGER;
+      return scan_before_operand(lexer, "trigger");
+    }
+    if (valid_symbols[HALT] && lexer->lookahead == 'h') {
+      lexer->result_symbol = HALT;
+      return scan_before_operand(lexer, "halt");
+    }
+    if (valid_symbols[CLAIM] && lexer->lookahead == 'c') {
+      lexer->result_symbol = CLAIM;
+      return scan_before_brace(lexer, "claim", true);
+    }
+    if (valid_symbols[RELEASE] && lexer->lookahead == 'r') {
+      lexer->result_symbol = RELEASE;
+      return scan_before_brace(lexer, "release", false);
     }
   }
 

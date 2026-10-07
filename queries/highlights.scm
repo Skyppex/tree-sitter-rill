@@ -26,6 +26,12 @@
 (rill_definition name: (identifier) @function)
 
 (event_declaration name: (identifier) @function)
+(sequence_declaration name: (identifier) @function)
+(setting name: (identifier) @property)
+
+(invoke_expression target: (identifier) @function.call)
+(trigger_expression target: (identifier) @function.call)
+(halt_expression target: (identifier) @function.call)
 (event_handler event: (identifier) @function)
 
 (call_expression function: (identifier) @function.call)
@@ -58,6 +64,17 @@
 ] @keyword
 
 "return" @keyword.return
+
+[
+  "seq"
+  "invoke"
+  "trigger"
+  "halt"
+  "claim"
+  "release"
+] @keyword
+
+(rest) @punctuation.special
 
 "as" @keyword.operator
 

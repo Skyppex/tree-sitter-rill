@@ -41,3 +41,15 @@
 (index_expression
   "[" @delimiter
   "]" @delimiter @sentinel) @container
+
+(settings
+  "(" @delimiter
+  ")" @delimiter @sentinel) @container
+
+(steps
+  "{" @delimiter
+  "}" @delimiter @sentinel) @container
+
+(repeat_frame
+  "[" @delimiter
+  "]" @delimiter @sentinel) @container

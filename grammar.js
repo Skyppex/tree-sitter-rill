@@ -41,6 +41,12 @@ export default grammar({
     $.block_comment,
     $._on,
     $._event,
+    $._seq,
+    $._invoke,
+    $._trigger,
+    $._halt,
+    $._claim,
+    $._release,
     $._error_sentinel,
   ],
 
@@ -66,6 +72,7 @@ export default grammar({
       $.function_definition,
       $.rill_definition,
       $.event_declaration,
+      $.sequence_declaration,
       $.event_handler,
       $.let_statement,
       $.state_statement,
@@ -160,13 +167,48 @@ export default grammar({
       optional(seq(':', optional(field('value', $._expression)))),
     )),
 
-    // `on note_on(note) { ... }`
+    // `on keys(note) { ... }`, `on keys(note) claim { ... }`,
+    // `on keys release { ... }`, `on start { ... }`
     event_handler: $ => prec.right(seq(
       alias($._on, 'on'),
       field('event', $.identifier),
       optional(field('parameters', $.event_parameters)),
+      optional(field('mode', $.handler_mode)),
       optional(field('body', $.block)),
     )),
+
+    // How a handler shares notes over a voice pool.
+    handler_mode: $ => choice(
+      prec.right(seq(alias($._claim, 'claim'), optional(field('arguments', $.arguments)))),
+      alias($._release, 'release'),
+    ),
+
+    // `seq riff(step: 1/8, tempo: 120bpm) { C4, _, E4@0.5, [G4, B4] }`
+    sequence_declaration: $ => prec.right(seq(
+      alias($._seq, 'seq'),
+      field('name', $.identifier),
+      optional(field('settings', $.settings)),
+      optional(field('steps', $.steps)),
+    )),
+
+    settings: $ => seq('(', repeat(choice($.setting, ',')), ')'),
+
+    // `tempo: 120bpm`
+    setting: $ => prec.right(seq(
+      field('name', $.identifier),
+      optional(seq(':', optional(field('value', $._expression)))),
+    )),
+
+    // Steps may span lines; a line break is not a separator here.
+    steps: $ => seq('{', repeat(choice($.step, ',')), '}'),
+
+    // `C4`, `[G4, B4]@1`, `_`
+    step: $ => prec.right(seq(
+      field('notes', choice($.rest, $._expression)),
+      optional(seq('@', optional(field('velocity', $._expression)))),
+    )),
+
+    rest: _ => '_',
 
     event_parameters: $ => seq('(', repeat(choice($.identifier, ',')), ')'),
 
@@ -240,7 +282,11 @@ export default grammar({
       $.field_expression,
       $.parenthesized_expression,
       $.frame,
+      $.repeat_frame,
       $.if_expression,
+      $.invoke_expression,
+      $.trigger_expression,
+      $.halt_expression,
       $.function,
       $.block,
     ),
@@ -327,6 +373,48 @@ export default grammar({
     parenthesized_expression: $ => seq('(', optional($._expression), ')'),
 
     frame: $ => seq('[', repeat1(choice($._expression, ',')), ']'),
+
+    // `[synth(); 8]`: eight separate instances.
+    repeat_frame: $ => seq(
+      '[',
+      field('value', $._expression),
+      ';',
+      optional(field('count', $.integer)),
+      ']',
+    ),
+
+    // An instance id or a step: `3`, `id`, `note.instance`.
+    // As in the compiler, a name followed by another name is an id.
+    _operand: $ => choice($.number, prec(1, $.identifier), $.operand_field),
+
+    operand_field: $ => seq(
+      field('value', $.identifier),
+      repeat1(seq('.', field('field', alias($.identifier, $.field_identifier)))),
+    ),
+
+    // `invoke riff(tempo: 90bpm)`, `invoke id riff`, `invoke keys(pitch: C4)`
+    invoke_expression: $ => prec.right(seq(
+      alias($._invoke, 'invoke'),
+      optional(field('id', $._operand)),
+      field('target', $.identifier),
+      optional(field('arguments', $.arguments)),
+    )),
+
+    // `trigger 3 riff`, `trigger 3 id riff(tempo: speed)`
+    trigger_expression: $ => prec.right(seq(
+      alias($._trigger, 'trigger'),
+      field('step', $._operand),
+      optional(field('id', $._operand)),
+      field('target', $.identifier),
+      optional(field('arguments', $.arguments)),
+    )),
+
+    // `halt riff`, `halt id riff`
+    halt_expression: $ => prec.right(seq(
+      alias($._halt, 'halt'),
+      optional(field('id', $._operand)),
+      field('target', $.identifier),
+    )),
 
     if_expression: $ => prec.right(PREC.if, seq(
       'if',
