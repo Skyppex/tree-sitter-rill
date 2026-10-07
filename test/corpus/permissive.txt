@@ -81,8 +81,9 @@ rill main() sample {
             (identifier))))
       (event_declaration
         (identifier)
-        (event_parameters
-          (identifier)))
+        (event_filters
+          (event_filter
+            (identifier))))
       (return_statement
         (call_expression
           (identifier)

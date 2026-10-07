@@ -16,6 +16,8 @@
 
 (parameter name: (identifier) @variable.parameter)
 (event_parameters (identifier) @variable.parameter)
+(event_filter name: (identifier) @property)
+(event_kind) @type.builtin
 (argument name: (identifier) @variable.parameter)
 
 ; Definitions and calls

@@ -143,11 +143,21 @@ export default grammar({
       )),
     )),
 
-    // `event note_on(note)`
+    // `event keys note_on(sender: 5, channel: 1)`: a name, a kind and
+    // optional filters.
     event_declaration: $ => prec.right(seq(
       alias($._event, 'event'),
       field('name', $.identifier),
-      optional(field('parameters', $.event_parameters)),
+      optional(field('kind', alias($.identifier, $.event_kind))),
+      optional(field('filters', $.event_filters)),
+    )),
+
+    event_filters: $ => seq('(', repeat(choice($.event_filter, ',')), ')'),
+
+    // `channel: 1`
+    event_filter: $ => prec.right(seq(
+      field('name', $.identifier),
+      optional(seq(':', optional(field('value', $._expression)))),
     )),
 
     // `on note_on(note) { ... }`

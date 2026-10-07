@@ -2,10 +2,11 @@
 Event declarations
 ================================================================================
 
-event note_on(note)
-event control_change(control, cc,);
+event keys note_on(sender: 5, channel: 1)
+event lifts note_off(channel: 1,);
+event mod control_change
 event tick
-event bang()
+event bang note_on()
 rill main() sample { return 0 }
 
 --------------------------------------------------------------------------------
@@ -13,18 +14,33 @@ rill main() sample { return 0 }
 (source_file
   (event_declaration
     (identifier)
-    (event_parameters
-      (identifier)))
+    (event_kind)
+    (event_filters
+      (event_filter
+        (identifier)
+        (number
+          (integer)))
+      (event_filter
+        (identifier)
+        (number
+          (integer)))))
   (event_declaration
     (identifier)
-    (event_parameters
-      (identifier)
-      (identifier)))
+    (event_kind)
+    (event_filters
+      (event_filter
+        (identifier)
+        (number
+          (integer)))))
+  (event_declaration
+    (identifier)
+    (event_kind))
   (event_declaration
     (identifier))
   (event_declaration
     (identifier)
-    (event_parameters))
+    (event_kind)
+    (event_filters))
   (rill_definition
     (identifier)
     (parameters)
@@ -41,7 +57,7 @@ Event handlers
 rill main() sample {
   state gain = 0.0
 
-  on note_on(note) {
+  on keys(note) {
     gain = note.velocity * note.velocity
   }
   on tick { gain = 0 } let x = 1
@@ -99,7 +115,7 @@ Event handlers nest in blocks
 
 rill main() sample {
   if ready {
-    on note_on(note) { pitch = note.pitch }
+    on keys(note) { pitch = note.pitch }
   }
   return 0
 }
@@ -242,6 +258,18 @@ rill main() sample {
   let a = note
     .pitch
 }
+
+--------------------------------------------------------------------------------
+
+
+
+================================================================================
+Event declarations being typed
+:error
+================================================================================
+
+event keys note_on(sender: , channel
+rill main() Sample { return 0 }
 
 --------------------------------------------------------------------------------
 

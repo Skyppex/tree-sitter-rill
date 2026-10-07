@@ -352,6 +352,42 @@
     "type": "event_declaration",
     "named": true,
     "fields": {
+      "filters": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "event_filters",
+            "named": true
+          }
+        ]
+      },
+      "kind": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "event_kind",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "event_filter",
+    "named": true,
+    "fields": {
       "name": {
         "multiple": false,
         "required": true,
@@ -362,16 +398,31 @@
           }
         ]
       },
-      "parameters": {
+      "value": {
         "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "event_parameters",
+            "type": "_expression",
             "named": true
           }
         ]
       }
+    }
+  },
+  {
+    "type": "event_filters",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "event_filter",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1209,6 +1260,10 @@
   {
     "type": "event",
     "named": false
+  },
+  {
+    "type": "event_kind",
+    "named": true
   },
   {
     "type": "false",

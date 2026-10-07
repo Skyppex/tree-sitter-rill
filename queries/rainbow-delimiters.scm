@@ -14,6 +14,10 @@
   "(" @delimiter
   ")" @delimiter @sentinel) @container
 
+(event_filters
+  "(" @delimiter
+  ")" @delimiter @sentinel) @container
+
 (event_parameters
   "(" @delimiter
   ")" @delimiter @sentinel) @container
