@@ -1,0 +1,125 @@
+================================================================================
+For loops and ranges
+================================================================================
+
+rill f<N>(xs: [Sample; N]) Sample {
+  state y = 0.0
+  for i in 0..N {
+    y += xs[i]
+  }
+  for j in 1..=4 { y = y * 0.5 }
+  for x in xs { y += x }
+  return y
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (size_parameters
+      (identifier))
+    (parameters
+      (parameter
+        (identifier)
+        (frame_type
+          (type_identifier)
+          (identifier))))
+    (type_identifier)
+    (block
+      (state_statement
+        (identifier)
+        (number
+          (float)))
+      (for_statement
+        (identifier)
+        (range_expression
+          (number
+            (integer))
+          (identifier))
+        (block
+          (assignment
+            (identifier)
+            (index_expression
+              (identifier)
+              (identifier)))))
+      (for_statement
+        (identifier)
+        (range_expression
+          (number
+            (integer))
+          (number
+            (integer)))
+        (block
+          (assignment
+            (identifier)
+            (binary_expression
+              (identifier)
+              (number
+                (float))))))
+      (for_statement
+        (identifier)
+        (identifier)
+        (block
+          (assignment
+            (identifier)
+            (identifier))))
+      (return_statement
+        (identifier)))))
+
+================================================================================
+Range precedence
+================================================================================
+
+let a = 0..n * 2 |> f
+let b = x || y..z
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (let_statement
+    (identifier)
+    (pipe_expression
+      (range_expression
+        (number
+          (integer))
+        (binary_expression
+          (identifier)
+          (number
+            (integer))))
+      (identifier)))
+  (let_statement
+    (identifier)
+    (range_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (identifier))))
+
+================================================================================
+Loops being typed
+================================================================================
+
+rill f() Sample {
+  for i in 0.. {
+  }
+  return 0
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (for_statement
+        (identifier)
+        (range_expression
+          (number
+            (integer))
+          (block)))
+      (return_statement
+        (number
+          (integer))))))

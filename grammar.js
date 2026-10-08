@@ -19,14 +19,15 @@ const PREC = {
   if: 1,
   assign: 0,
   pipe: 1,
-  or: 2,
-  and: 3,
-  compare: 4,
-  sum: 5,
-  term: 6,
-  cast: 7,
-  unary: 8,
-  postfix: 9,
+  range: 2,
+  or: 3,
+  and: 4,
+  compare: 5,
+  sum: 6,
+  term: 7,
+  cast: 8,
+  unary: 9,
+  postfix: 10,
 };
 
 export default grammar({
@@ -58,7 +59,9 @@ export default grammar({
   // This lets error recovery restart at the next definition or statement
   // instead of reading e.g. `rill` as a parameter name after an unclosed `(`.
   reserved: {
-    global: _ => ['fn', 'rill', 'let', 'state', 'return', 'if', 'else', 'as', 'true', 'false'],
+    global: _ => [
+      'fn', 'rill', 'let', 'state', 'return', 'if', 'else', 'as', 'for', 'in', 'true', 'false',
+    ],
   },
 
   supertypes: $ => [$._statement, $._expression, $._type],
@@ -78,6 +81,7 @@ export default grammar({
       $.state_statement,
       $.assignment,
       $.return_statement,
+      $.for_statement,
       $.expression_statement,
     ),
 
@@ -259,8 +263,16 @@ export default grammar({
     // The compiler only assigns to names; any expression is accepted here.
     assignment: $ => prec.right(PREC.assign, seq(
       field('target', $._expression),
-      '=',
+      field('operator', choice('=', '+=')),
       optional(field('value', $._expression)),
+    )),
+
+    // `for i in 0..N { ... }`, `for x in frame { ... }`
+    for_statement: $ => prec.right(PREC.if, seq(
+      'for',
+      optional(field('name', $.identifier)),
+      optional(seq('in', optional(field('iterator', $._expression)))),
+      optional(field('body', $.block)),
     )),
 
     return_statement: $ => prec.right(seq('return', optional(field('value', $._expression)))),
@@ -275,6 +287,7 @@ export default grammar({
       $.identifier,
       $.unary_expression,
       $.binary_expression,
+      $.range_expression,
       $.cast_expression,
       $.pipe_expression,
       $.call_expression,
@@ -328,6 +341,20 @@ export default grammar({
         field('right', $._expression),
       ))));
     },
+
+    // `0..N` or `1..=N`. While being typed the end may be missing; that
+    // form is right-associative so an end that follows is always taken.
+    range_expression: $ => choice(
+      prec.left(PREC.range, seq(
+        field('start', $._expression),
+        field('operator', choice('..', '..=')),
+        field('end', $._expression),
+      )),
+      prec.right(PREC.range, seq(
+        field('start', $._expression),
+        field('operator', choice('..', '..=')),
+      )),
+    ),
 
     // `x as Float`. While being typed the type may be missing; that form is
     // right-associative so a type that follows is always taken.

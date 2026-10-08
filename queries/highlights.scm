@@ -66,6 +66,11 @@
 "return" @keyword.return
 
 [
+  "for"
+  "in"
+] @keyword.repeat
+
+[
   "seq"
   "invoke"
   "trigger"
@@ -105,6 +110,9 @@
   "||"
   "|>"
   "@"
+  "+="
+  ".."
+  "..="
 ] @operator
 
 "." @punctuation.delimiter
