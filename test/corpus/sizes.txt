@@ -1,0 +1,66 @@
+================================================================================
+Explicit size arguments
+================================================================================
+
+let a = unison<32>(440Hz, 25cents)
+let b = x |> mix<4, N>(1)
+let c = x < y
+let d = n < 3 && m > 2
+let e = f<4>
+(x)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (let_statement
+    (identifier)
+    (call_expression
+      (identifier)
+      (size_arguments
+        (integer))
+      (arguments
+        (argument
+          (number
+            (integer)
+            (unit)))
+        (argument
+          (number
+            (integer)
+            (unit))))))
+  (let_statement
+    (identifier)
+    (pipe_expression
+      (identifier)
+      (identifier)
+      (size_arguments
+        (integer)
+        (identifier))
+      (arguments
+        (argument
+          (number
+            (integer))))))
+  (let_statement
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (let_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (number
+          (integer)))
+      (binary_expression
+        (identifier)
+        (number
+          (integer)))))
+  (let_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (number
+          (integer)))
+      (parenthesized_expression
+        (identifier)))))

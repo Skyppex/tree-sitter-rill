@@ -1763,6 +1763,22 @@
             "members": [
               {
                 "type": "FIELD",
+                "name": "sizes",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "size_arguments"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
                 "name": "arguments",
                 "content": {
                   "type": "SYMBOL",
@@ -2183,6 +2199,22 @@
             }
           },
           {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "sizes",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "size_arguments"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
             "type": "FIELD",
             "name": "arguments",
             "content": {
@@ -2192,6 +2224,44 @@
           }
         ]
       }
+    },
+    "size_arguments": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_size_open"
+          },
+          "named": false,
+          "value": "<"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "integer"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "STRING",
+                "value": ","
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
     },
     "arguments": {
       "type": "SEQ",
@@ -2917,6 +2987,10 @@
     {
       "type": "SYMBOL",
       "name": "_release"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_size_open"
     },
     {
       "type": "SYMBOL",

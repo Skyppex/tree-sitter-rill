@@ -12,6 +12,7 @@
     "Sample" "Float" "Int" "Bool" "Freq" "Pitch" "Time" "Interval" "Gain"))
 
 (size_parameters (identifier) @type.parameter)
+(size_arguments (identifier) @type.parameter)
 (frame_type size: (identifier) @type.parameter)
 
 (parameter name: (identifier) @variable.parameter)
@@ -118,6 +119,7 @@
 "." @punctuation.delimiter
 
 (size_parameters ["<" ">"] @punctuation.bracket)
+(size_arguments ["<" ">"] @punctuation.bracket)
 
 [
   "("

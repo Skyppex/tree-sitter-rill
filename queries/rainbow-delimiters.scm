@@ -53,3 +53,7 @@
 (repeat_frame
   "[" @delimiter
   "]" @delimiter @sentinel) @container
+
+(size_arguments
+  "<" @delimiter
+  ">" @delimiter @sentinel) @container

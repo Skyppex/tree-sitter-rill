@@ -15,6 +15,9 @@
 //   follows (`invoke riff`, `trigger 3 riff`).
 // - `claim` is a keyword before `{` or `(`, and `release` before `{`, as in
 //   `on keys(note) claim { ... }`.
+// - `_size_open` is the `<` of explicit size arguments, `f<4, N>(x)`. As in
+//   the compiler, it is one only when names or numbers separated by commas,
+//   a `>` and then `(` follow on the same line; otherwise `<` compares.
 
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/parser.h"
@@ -33,6 +36,7 @@ enum TokenType {
   HALT,
   CLAIM,
   RELEASE,
+  SIZE_OPEN,
   ERROR_SENTINEL,
 };
 
@@ -174,6 +178,30 @@ static bool scan_before_brace(TSLexer *lexer, const char *keyword, bool paren) {
   return lexer->lookahead == '{' || (paren && lexer->lookahead == '(');
 }
 
+static void skip_spaces(TSLexer *lexer) {
+  while (lexer->lookahead == ' ' || lexer->lookahead == '\t') advance(lexer);
+}
+
+// At `<`: consume it, and check that `a, 4, N>(` follows.
+static bool scan_size_open(TSLexer *lexer) {
+  advance(lexer);
+  lexer->mark_end(lexer);
+  for (;;) {
+    skip_spaces(lexer);
+    if (!is_ident_char(lexer->lookahead)) return false;
+    while (is_ident_char(lexer->lookahead)) advance(lexer);
+    skip_spaces(lexer);
+    if (lexer->lookahead == ',') {
+      advance(lexer);
+      continue;
+    }
+    if (lexer->lookahead != '>') return false;
+    advance(lexer);
+    skip_spaces(lexer);
+    return lexer->lookahead == '(';
+  }
+}
+
 bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
   Scanner *scanner = payload;
   // During error recovery every symbol is valid; only comments are safe to
@@ -207,6 +235,10 @@ bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const
   }
 
   if (!valid_symbols[ERROR_SENTINEL]) {
+    if (valid_symbols[SIZE_OPEN] && !newline && lexer->lookahead == '<') {
+      lexer->result_symbol = SIZE_OPEN;
+      return scan_size_open(lexer);
+    }
     if (valid_symbols[ON] && lexer->lookahead == 'o') {
       lexer->result_symbol = ON;
       return scan_contextual(lexer, "on");

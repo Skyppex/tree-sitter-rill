@@ -48,6 +48,7 @@ export default grammar({
     $._halt,
     $._claim,
     $._release,
+    $._size_open,
     $._error_sentinel,
   ],
 
@@ -323,6 +324,7 @@ export default grammar({
     // rather than ending the pipe at `f`.
     _pipe_target: $ => prec.right(seq(
       field('function', $.identifier),
+      optional(field('sizes', $.size_arguments)),
       optional(field('arguments', $.arguments)),
     )),
 
@@ -372,10 +374,21 @@ export default grammar({
       field('operand', $._expression),
     )),
 
+    // `f(a)`, or with explicit sizes `f<4, N>(a)`.
     call_expression: $ => prec(PREC.postfix, seq(
       field('function', $.identifier),
+      optional(field('sizes', $.size_arguments)),
       field('arguments', $.arguments),
     )),
+
+    // `<4, N>`: sizes given by hand. The scanner only opens one where a
+    // whole size list and `(` follow, as the compiler does, so `f < 4`
+    // stays a comparison.
+    size_arguments: $ => seq(
+      alias($._size_open, '<'),
+      repeat(choice($.integer, $.identifier, ',')),
+      '>',
+    ),
 
     arguments: $ => seq('(', repeat(choice($.argument, ',')), ')'),
 
