@@ -13,6 +13,7 @@
 (size_parameters (identifier) @local.definition)
 (let_statement name: (identifier) @local.definition)
 (state_statement name: (identifier) @local.definition)
+(const_statement name: (identifier) @local.definition)
 (for_statement name: (identifier) @local.definition)
 (event_handler parameters: (event_parameters (identifier) @local.definition))
 

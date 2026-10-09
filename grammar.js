@@ -62,7 +62,7 @@ export default grammar({
   // instead of reading e.g. `rill` as a parameter name after an unclosed `(`.
   reserved: {
     global: _ => [
-      'fn', 'rill', 'let', 'state', 'return', 'if', 'else', 'as', 'for', 'in', 'true', 'false',
+      'fn', 'rill', 'let', 'state', 'const', 'return', 'if', 'else', 'as', 'for', 'in', 'true', 'false',
     ],
   },
 
@@ -81,6 +81,7 @@ export default grammar({
       $.event_handler,
       $.let_statement,
       $.state_statement,
+      $.const_statement,
       $.assignment,
       $.return_statement,
       $.for_statement,
@@ -249,6 +250,9 @@ export default grammar({
     let_statement: $ => prec.right(seq('let', optional($._binding))),
 
     state_statement: $ => prec.right(seq('state', optional($._binding))),
+
+    // At the top level or in a block, like `let`.
+    const_statement: $ => prec.right(seq('const', optional($._binding))),
 
     _binding: $ => prec.right(choice(
       seq(field('name', $.identifier), optional($._binding_rest)),

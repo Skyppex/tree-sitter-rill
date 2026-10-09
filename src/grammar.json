@@ -60,6 +60,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "const_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "assignment"
         },
         {
@@ -1274,6 +1278,31 @@
           {
             "type": "STRING",
             "value": "state"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_binding"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "const_statement": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "const"
           },
           {
             "type": "CHOICE",
@@ -3209,6 +3238,10 @@
       {
         "type": "STRING",
         "value": "state"
+      },
+      {
+        "type": "STRING",
+        "value": "const"
       },
       {
         "type": "STRING",

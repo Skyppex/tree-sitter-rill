@@ -262,3 +262,42 @@ rill main() sample {
         (block
           (expression_statement
             (identifier)))))))
+
+================================================================================
+Constants at the top level and in a block
+================================================================================
+
+const VOICES = 8
+const ROOT: Pitch = C3
+
+rill main() Sample {
+  const HALF: Int = VOICES / 2
+  return 0
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (const_statement
+    (identifier)
+    (number
+      (integer)))
+  (const_statement
+    (identifier)
+    (type_identifier)
+    (identifier))
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (const_statement
+        (identifier)
+        (type_identifier)
+        (binary_expression
+          (identifier)
+          (number
+            (integer))))
+      (return_statement
+        (number
+          (integer))))))

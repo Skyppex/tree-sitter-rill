@@ -94,6 +94,10 @@
         "named": true
       },
       {
+        "type": "const_statement",
+        "named": true
+      },
+      {
         "type": "event_declaration",
         "named": true
       },
@@ -409,6 +413,42 @@
       "value": {
         "multiple": false,
         "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "const_statement",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_type",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": false,
         "types": [
           {
             "type": "_expression",
@@ -1786,6 +1826,10 @@
   },
   {
     "type": "claim",
+    "named": false
+  },
+  {
+    "type": "const",
     "named": false
   },
   {

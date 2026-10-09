@@ -5,6 +5,8 @@
 ((identifier) @constant
   (#match? @constant "^[A-Z][A-Z0-9_]*$"))
 
+(const_statement name: (identifier) @constant)
+
 (type_identifier) @type
 
 ((type_identifier) @type.builtin
@@ -60,6 +62,7 @@
 [
   "let"
   "state"
+  "const"
   "event"
   "on"
 ] @keyword
