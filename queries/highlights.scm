@@ -69,6 +69,15 @@
 
 (each) @keyword
 
+[
+  "import"
+  "export"
+] @keyword.import
+
+(string) @string
+
+(import_statement path: (string) @string.special.path)
+
 "return" @keyword.return
 
 [

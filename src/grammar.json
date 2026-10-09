@@ -32,6 +32,14 @@
       "members": [
         {
           "type": "SYMBOL",
+          "name": "import_statement"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "export_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "function_definition"
         },
         {
@@ -79,6 +87,109 @@
           "name": "expression_statement"
         }
       ]
+    },
+    "import_statement": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "import"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "path",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "string"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "export_statement": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "export"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "declaration",
+                "content": {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "function_definition"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "rill_definition"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "const_statement"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "event_declaration"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "sequence_declaration"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "import_statement"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "string": {
+      "type": "TOKEN",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "\""
+          },
+          {
+            "type": "PATTERN",
+            "value": "[^\"\\n]*"
+          },
+          {
+            "type": "STRING",
+            "value": "\""
+          }
+        ]
+      }
     },
     "function_definition": {
       "type": "PREC_RIGHT",
@@ -3126,7 +3237,7 @@
     },
     "identifier": {
       "type": "PATTERN",
-      "value": "[A-Za-z_][A-Za-z0-9_]*"
+      "value": "[A-G]#[A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*"
     },
     "line_comment": {
       "type": "TOKEN",
@@ -3242,6 +3353,14 @@
       {
         "type": "STRING",
         "value": "const"
+      },
+      {
+        "type": "STRING",
+        "value": "import"
+      },
+      {
+        "type": "STRING",
+        "value": "export"
       },
       {
         "type": "STRING",

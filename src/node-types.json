@@ -106,6 +106,10 @@
         "named": true
       },
       {
+        "type": "export_statement",
+        "named": true
+      },
+      {
         "type": "expression_statement",
         "named": true
       },
@@ -115,6 +119,10 @@
       },
       {
         "type": "function_definition",
+        "named": true
+      },
+      {
+        "type": "import_statement",
         "named": true
       },
       {
@@ -597,6 +605,42 @@
     }
   },
   {
+    "type": "export_statement",
+    "named": true,
+    "fields": {
+      "declaration": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "const_statement",
+            "named": true
+          },
+          {
+            "type": "event_declaration",
+            "named": true
+          },
+          {
+            "type": "function_definition",
+            "named": true
+          },
+          {
+            "type": "import_statement",
+            "named": true
+          },
+          {
+            "type": "rill_definition",
+            "named": true
+          },
+          {
+            "type": "sequence_declaration",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "expression_statement",
     "named": true,
     "fields": {},
@@ -926,6 +970,22 @@
         "types": [
           {
             "type": "block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "import_statement",
+    "named": true,
+    "fields": {
+      "path": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string",
             "named": true
           }
         ]
@@ -1849,6 +1909,10 @@
     "named": true
   },
   {
+    "type": "export",
+    "named": false
+  },
+  {
     "type": "false",
     "named": false
   },
@@ -1878,6 +1942,10 @@
   },
   {
     "type": "if",
+    "named": false
+  },
+  {
+    "type": "import",
     "named": false
   },
   {
@@ -1932,6 +2000,10 @@
   {
     "type": "state",
     "named": false
+  },
+  {
+    "type": "string",
+    "named": true
   },
   {
     "type": "trigger",

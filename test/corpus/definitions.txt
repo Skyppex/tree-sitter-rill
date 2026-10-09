@@ -205,3 +205,63 @@ rill f(rate: f32) sample { return rate * RATE }
         (binary_expression
           (identifier)
           (identifier))))))
+
+================================================================================
+Imports and exports
+================================================================================
+
+import "lib/osc"
+export import "synth"
+
+export const VOICES = 4
+export fn half(x: Float) Float { x / 2 }
+export rill pad() Sample { return 0 }
+export event keys note_on
+export seq riff { C4 }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (string))
+  (export_statement
+    (import_statement
+      (string)))
+  (export_statement
+    (const_statement
+      (identifier)
+      (number
+        (integer))))
+  (export_statement
+    (function_definition
+      (identifier)
+      (parameters
+        (parameter
+          (identifier)
+          (type_identifier)))
+      (type_identifier)
+      (block
+        (expression_statement
+          (binary_expression
+            (identifier)
+            (number
+              (integer)))))))
+  (export_statement
+    (rill_definition
+      (identifier)
+      (parameters)
+      (type_identifier)
+      (block
+        (return_statement
+          (number
+            (integer))))))
+  (export_statement
+    (event_declaration
+      (identifier)
+      (event_kind)))
+  (export_statement
+    (sequence_declaration
+      (identifier)
+      (steps
+        (step
+          (identifier))))))

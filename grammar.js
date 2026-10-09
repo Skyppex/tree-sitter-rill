@@ -62,7 +62,7 @@ export default grammar({
   // instead of reading e.g. `rill` as a parameter name after an unclosed `(`.
   reserved: {
     global: _ => [
-      'fn', 'rill', 'let', 'state', 'const', 'return', 'if', 'else', 'as', 'for', 'in', 'true', 'false',
+      'fn', 'rill', 'let', 'state', 'const', 'import', 'export', 'return', 'if', 'else', 'as', 'for', 'in', 'true', 'false',
     ],
   },
 
@@ -74,6 +74,8 @@ export default grammar({
     _statement_or_separator: $ => choice($._statement, ';', $._newline),
 
     _statement: $ => choice(
+      $.import_statement,
+      $.export_statement,
       $.function_definition,
       $.rill_definition,
       $.event_declaration,
@@ -87,6 +89,27 @@ export default grammar({
       $.for_statement,
       $.expression_statement,
     ),
+
+    // ---- modules ----------------------------------------------------------
+
+    // `import "lib/osc"`: the path of another file, without `.rill`.
+    import_statement: $ => prec.right(seq('import', optional(field('path', $.string)))),
+
+    // `export` before a definition or an import makes it usable by files
+    // that import this one.
+    export_statement: $ => prec.right(seq(
+      'export',
+      optional(field('declaration', choice(
+        $.function_definition,
+        $.rill_definition,
+        $.const_statement,
+        $.event_declaration,
+        $.sequence_declaration,
+        $.import_statement,
+      ))),
+    )),
+
+    string: _ => token(seq('"', /[^"\n]*/, '"')),
 
     // ---- definitions ------------------------------------------------------
 
@@ -520,7 +543,8 @@ export default grammar({
 
     boolean: _ => choice('true', 'false'),
 
-    identifier: _ => /[A-Za-z_][A-Za-z0-9_]*/,
+    // `#` is a sharp, so only right after a note letter, as in `F#4`.
+    identifier: _ => /[A-G]#[A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*/,
 
     line_comment: _ => token(seq('//', /[^\n]*/)),
   },

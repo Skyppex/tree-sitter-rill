@@ -244,3 +244,30 @@ rill main() Sample {
               (identifier)))))
       (return_statement
         (identifier)))))
+
+================================================================================
+Sharp notes
+================================================================================
+
+rill main() Sample {
+  let x = [C#3, G#4, F#]
+  return 0
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (frame
+          (identifier)
+          (identifier)
+          (identifier)))
+      (return_statement
+        (number
+          (integer))))))
