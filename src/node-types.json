@@ -177,6 +177,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "each",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1765,6 +1775,10 @@
   {
     "type": "claim",
     "named": false
+  },
+  {
+    "type": "each",
+    "named": true
   },
   {
     "type": "else",

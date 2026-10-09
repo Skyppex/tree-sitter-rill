@@ -64,6 +64,8 @@
   "on"
 ] @keyword
 
+(each) @keyword
+
 "return" @keyword.return
 
 [

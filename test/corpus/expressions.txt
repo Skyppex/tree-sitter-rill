@@ -150,3 +150,97 @@ fn f() sample { x + 1 |> abs |> peak(release: 10ms) }
               (number
                 (integer)
                 (unit)))))))))
+
+================================================================================
+Each before an argument
+================================================================================
+
+rill main() Sample {
+  let a = saw(110Hz, offset: each random())
+  let b = voices |> pan(each lfo(0.3Hz))
+  let c = f(each [1, 2], each (x + 1), each !b)
+  let d = f(each, pos: each)
+  let e = each(x)
+  return a
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (number
+                (integer)
+                (unit)))
+            (argument
+              (identifier)
+              (each)
+              (call_expression
+                (identifier)
+                (arguments))))))
+      (let_statement
+        (identifier)
+        (pipe_expression
+          (identifier)
+          (identifier)
+          (arguments
+            (argument
+              (each)
+              (call_expression
+                (identifier)
+                (arguments
+                  (argument
+                    (number
+                      (float)
+                      (unit)))))))))
+      (let_statement
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (each)
+              (frame
+                (number
+                  (integer))
+                (number
+                  (integer))))
+            (argument
+              (each)
+              (parenthesized_expression
+                (binary_expression
+                  (identifier)
+                  (number
+                    (integer)))))
+            (argument
+              (each)
+              (unary_expression
+                (identifier))))))
+      (let_statement
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (identifier))
+            (argument
+              (identifier)
+              (identifier)))))
+      (let_statement
+        (identifier)
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (identifier)))))
+      (return_statement
+        (identifier)))))

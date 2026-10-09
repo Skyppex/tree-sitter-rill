@@ -15,6 +15,9 @@
 //   follows (`invoke riff`, `trigger 3 riff`).
 // - `claim` is a keyword before `{` or `(`, and `release` before `{`, as in
 //   `on keys(note) claim { ... }`.
+// - `each` is a keyword before an argument's value when something that
+//   starts an expression follows on the same line: a name, a number, `[`,
+//   `!`, or `(` after a space (`each(x)` calls a fn named `each`).
 // - `_size_open` is the `<` of explicit size arguments, `f<4, N>(x)`. As in
 //   the compiler, it is one only when names or numbers separated by commas,
 //   a `>` and then `(` follow on the same line; otherwise `<` compares.
@@ -37,6 +40,7 @@ enum TokenType {
   CLAIM,
   RELEASE,
   SIZE_OPEN,
+  EACH,
   ERROR_SENTINEL,
 };
 
@@ -182,6 +186,29 @@ static void skip_spaces(TSLexer *lexer) {
   while (lexer->lookahead == ' ' || lexer->lookahead == '\t') advance(lexer);
 }
 
+// Scan `each` before an argument's value. A word after it must not be one
+// that continues an expression (`each as Float` casts a name `each`).
+static bool scan_each(TSLexer *lexer) {
+  if (!eat_word(lexer, "each")) return false;
+  lexer->mark_end(lexer);
+  bool spaced = lexer->lookahead == ' ' || lexer->lookahead == '\t';
+  skip_spaces(lexer);
+  int32_t c = lexer->lookahead;
+  if (c == '[' || c == '!') return true;
+  if (c == '(') return spaced;
+  if (!is_ident_char(c)) return false;
+  char word[5];
+  unsigned len = 0;
+  while (is_ident_char(lexer->lookahead)) {
+    if (len < sizeof word - 1) word[len] = (char)lexer->lookahead;
+    len++;
+    advance(lexer);
+  }
+  if (len >= sizeof word) return true;
+  word[len] = 0;
+  return strcmp(word, "as") != 0 && strcmp(word, "in") != 0 && strcmp(word, "else") != 0;
+}
+
 // At `<`: consume it, and check that `a, 4, N>(` follows.
 static bool scan_size_open(TSLexer *lexer) {
   advance(lexer);
@@ -242,6 +269,10 @@ bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const
     if (valid_symbols[ON] && lexer->lookahead == 'o') {
       lexer->result_symbol = ON;
       return scan_contextual(lexer, "on");
+    }
+    if (valid_symbols[EACH] && lexer->lookahead == 'e') {
+      lexer->result_symbol = EACH;
+      return scan_each(lexer);
     }
     if (valid_symbols[EVENT] && lexer->lookahead == 'e') {
       lexer->result_symbol = EVENT;

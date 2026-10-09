@@ -49,6 +49,7 @@ export default grammar({
     $._claim,
     $._release,
     $._size_open,
+    $._each,
     $._error_sentinel,
   ],
 
@@ -393,8 +394,12 @@ export default grammar({
     arguments: $ => seq('(', repeat(choice($.argument, ',')), ')'),
 
     argument: $ => prec.right(choice(
-      seq(field('name', $.identifier), ':', optional(field('value', $._expression))),
-      field('value', $._expression),
+      seq(
+        field('name', $.identifier),
+        ':',
+        optional(seq(optional(alias($._each, $.each)), field('value', $._expression))),
+      ),
+      seq(optional(alias($._each, $.each)), field('value', $._expression)),
     )),
 
     index_expression: $ => prec(PREC.postfix, seq(
