@@ -238,7 +238,7 @@ export default grammar({
     frame_type: $ => seq(
       '[',
       optional(field('element', $._type)),
-      optional(seq(';', optional(field('size', choice($.integer, $.identifier))))),
+      optional(seq(';', optional(field('size', $._expression)))),
       ']',
     ),
 
@@ -387,8 +387,36 @@ export default grammar({
     // stays a comparison.
     size_arguments: $ => seq(
       alias($._size_open, '<'),
-      repeat(choice($.integer, $.identifier, ',')),
+      repeat(choice($._size, ',')),
       '>',
+    ),
+
+    // A size in `<...>`: a number, a name, a field (`riff.step_count`), or
+    // arithmetic of those. No comparisons, so `>` ends the list.
+    _size: $ => choice(
+      $.integer,
+      $.identifier,
+      alias($.size_field, $.field_expression),
+      alias($.size_binary, $.binary_expression),
+    ),
+
+    size_field: $ => seq(
+      field('value', $.identifier),
+      '.',
+      field('field', alias($.identifier, $.field_identifier)),
+    ),
+
+    size_binary: $ => choice(
+      prec.left(PREC.sum, seq(
+        field('left', $._size),
+        field('operator', choice('+', '-')),
+        field('right', $._size),
+      )),
+      prec.left(PREC.term, seq(
+        field('left', $._size),
+        field('operator', choice('*', '/', '%')),
+        field('right', $._size),
+      )),
     ),
 
     arguments: $ => seq('(', repeat(choice($.argument, ',')), ')'),
@@ -424,7 +452,7 @@ export default grammar({
       '[',
       field('value', $._expression),
       ';',
-      optional(field('count', $.integer)),
+      optional(field('count', $._expression)),
       ']',
     ),
 

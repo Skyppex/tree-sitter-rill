@@ -119,11 +119,13 @@ rill mix_down<N, M,>(x: [sample; N], y: [[f32; 2]; M]) [sample; 1] {
         (frame_type
           (frame_type
             (type_identifier)
-            (integer))
+            (number
+              (integer)))
           (identifier))))
     (frame_type
       (type_identifier)
-      (integer))
+      (number
+        (integer)))
     (block
       (return_statement
         (frame

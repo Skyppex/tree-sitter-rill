@@ -19,19 +19,23 @@ rill main(x: [[Sample; 2]; N]) [Sample; 2] {
         (frame_type
           (frame_type
             (type_identifier)
-            (integer))
+            (number
+              (integer)))
           (identifier))))
     (frame_type
       (type_identifier)
-      (integer))
+      (number
+        (integer)))
     (block
       (state_statement
         (identifier)
         (frame_type
           (frame_type
             (type_identifier)
-            (integer))
-          (integer))
+            (number
+              (integer)))
+          (number
+            (integer)))
         (frame
           (frame
             (number

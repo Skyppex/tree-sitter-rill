@@ -19,8 +19,9 @@
 //   starts an expression follows on the same line: a name, a number, `[`,
 //   `!`, or `(` after a space (`each(x)` calls a fn named `each`).
 // - `_size_open` is the `<` of explicit size arguments, `f<4, N>(x)`. As in
-//   the compiler, it is one only when names or numbers separated by commas,
-//   a `>` and then `(` follow on the same line; otherwise `<` compares.
+//   the compiler, it is one only when sizes (names or numbers, with fields
+//   and arithmetic) separated by commas, a `>` and then `(` follow on the
+//   same line; otherwise `<` compares.
 
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/parser.h"
@@ -209,15 +210,26 @@ static bool scan_each(TSLexer *lexer) {
   return strcmp(word, "as") != 0 && strcmp(word, "in") != 0 && strcmp(word, "else") != 0;
 }
 
-// At `<`: consume it, and check that `a, 4, N>(` follows.
+static bool is_size_op(int32_t c) {
+  return c == '.' || c == '+' || c == '-' || c == '*' || c == '/' || c == '%';
+}
+
+// At `<`: consume it, and check that `a, 4, N>(` follows. Each size may
+// have fields and arithmetic, as in `riff.step_count * 2`.
 static bool scan_size_open(TSLexer *lexer) {
   advance(lexer);
   lexer->mark_end(lexer);
   for (;;) {
     skip_spaces(lexer);
     if (!is_ident_char(lexer->lookahead)) return false;
-    while (is_ident_char(lexer->lookahead)) advance(lexer);
-    skip_spaces(lexer);
+    for (;;) {
+      while (is_ident_char(lexer->lookahead)) advance(lexer);
+      skip_spaces(lexer);
+      if (!is_size_op(lexer->lookahead)) break;
+      advance(lexer);
+      skip_spaces(lexer);
+      if (!is_ident_char(lexer->lookahead)) return false;
+    }
     if (lexer->lookahead == ',') {
       advance(lexer);
       continue;

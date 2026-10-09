@@ -64,3 +64,90 @@ let e = f<4>
           (integer)))
       (parenthesized_expression
         (identifier)))))
+
+================================================================================
+Constant sizes
+================================================================================
+
+seq riff(step: 1/8) { C4, E4 }
+
+rill main() Sample {
+  let a: [Float; riff.step_count] = [1, 2]
+  let b = [0.5; riff.step_count * 2]
+  let c = first<riff.step_count, N + 1>(a)
+  let d = f < riff.step_count
+  return a[0]
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (sequence_declaration
+    (identifier)
+    (settings
+      (setting
+        (identifier)
+        (binary_expression
+          (number
+            (integer))
+          (number
+            (integer)))))
+    (steps
+      (step
+        (identifier))
+      (step
+        (identifier))))
+  (rill_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (let_statement
+        (identifier)
+        (frame_type
+          (type_identifier)
+          (field_expression
+            (identifier)
+            (field_identifier)))
+        (frame
+          (number
+            (integer))
+          (number
+            (integer))))
+      (let_statement
+        (identifier)
+        (repeat_frame
+          (number
+            (float))
+          (binary_expression
+            (field_expression
+              (identifier)
+              (field_identifier))
+            (number
+              (integer)))))
+      (let_statement
+        (identifier)
+        (call_expression
+          (identifier)
+          (size_arguments
+            (field_expression
+              (identifier)
+              (field_identifier))
+            (binary_expression
+              (identifier)
+              (integer)))
+          (arguments
+            (argument
+              (identifier)))))
+      (let_statement
+        (identifier)
+        (binary_expression
+          (identifier)
+          (field_expression
+            (identifier)
+            (field_identifier))))
+      (return_statement
+        (index_expression
+          (identifier)
+          (number
+            (integer)))))))

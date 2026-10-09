@@ -255,6 +255,10 @@
           {
             "type": "_expression",
             "named": true
+          },
+          {
+            "type": "integer",
+            "named": true
           }
         ]
       },
@@ -322,6 +326,10 @@
         "types": [
           {
             "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "integer",
             "named": true
           }
         ]
@@ -659,11 +667,7 @@
         "required": false,
         "types": [
           {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "integer",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -1256,7 +1260,7 @@
         "required": false,
         "types": [
           {
-            "type": "integer",
+            "type": "_expression",
             "named": true
           }
         ]
@@ -1440,6 +1444,14 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "field_expression",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true

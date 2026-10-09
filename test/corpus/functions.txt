@@ -62,7 +62,8 @@ fn apply(f: fn(Sample, Float,) [Sample; 2]) Bool { true }
             (type_identifier))
           (frame_type
             (type_identifier)
-            (integer)))))
+            (number
+              (integer))))))
     (type_identifier)
     (block
       (expression_statement
