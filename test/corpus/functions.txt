@@ -244,3 +244,37 @@ fn f(x: Sample) Int { x as }
       (expression_statement
         (cast_expression
           (identifier))))))
+
+================================================================================
+Frame casts
+================================================================================
+
+fn f(voices: [[Sample; 3]; 8]) [[Float; 3]; 8] { voices as Float }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (frame_type
+          (frame_type
+            (type_identifier)
+            (number
+              (integer)))
+          (number
+            (integer)))))
+    (frame_type
+      (frame_type
+        (type_identifier)
+        (number
+          (integer)))
+      (number
+        (integer)))
+    (block
+      (expression_statement
+        (cast_expression
+          (identifier)
+          (type_identifier))))))
