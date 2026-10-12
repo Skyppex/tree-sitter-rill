@@ -5,6 +5,7 @@ Function types
 rill voice(pitch: Pitch, tune: fn(Pitch) Freq) Sample { return 0 }
 fn tuned(steps: Int) fn(Pitch) Freq { fn(p) { equal(p, steps) } }
 fn apply(f: fn(Sample, Float,) [Sample; 2]) Bool { true }
+rill use(osc: rill(Freq) Sample) Sample { osc(440Hz) }
 
 --------------------------------------------------------------------------------
 
@@ -67,7 +68,26 @@ fn apply(f: fn(Sample, Float,) [Sample; 2]) Bool { true }
     (type_identifier)
     (block
       (expression_statement
-        (boolean)))))
+        (boolean))))
+  (rill_definition
+    (identifier)
+    (parameters
+      (parameter
+        (identifier)
+        (function_type
+          (parameter_types
+            (type_identifier))
+          (type_identifier))))
+    (type_identifier)
+    (block
+      (expression_statement
+        (call_expression
+          (identifier)
+          (arguments
+            (argument
+              (number
+                (integer)
+                (unit)))))))))
 
 ================================================================================
 Anonymous fns

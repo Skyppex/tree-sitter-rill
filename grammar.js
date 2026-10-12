@@ -250,9 +250,9 @@ export default grammar({
       $.function_type,
     ),
 
-    // `fn(Pitch) Freq`
+    // `fn(Pitch) Freq`, or `rill(Freq) Sample`
     function_type: $ => prec.right(seq(
-      'fn',
+      choice('fn', 'rill'),
       field('parameters', $.parameter_types),
       optional(field('return_type', $._type)),
     )),
