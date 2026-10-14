@@ -50,6 +50,7 @@ export default grammar({
     $._release,
     $._size_open,
     $._each,
+    $.flag_name,
     $._error_sentinel,
   ],
 
@@ -232,13 +233,28 @@ export default grammar({
     // Steps may span lines; a line break is not a separator here.
     steps: $ => seq('{', repeat(choice($.step, ',')), '}'),
 
-    // `C4`, `[G4, B4]@1`, `_`
+    // `C4`, `[G4, B4]@1`, `_`, `C2~`, `~@p.6`, `G3@v.5p1rt.3`
     step: $ => prec.right(seq(
-      field('notes', choice($.rest, $._expression)),
-      optional(seq('@', optional(field('velocity', $._expression)))),
+      field('notes', choice($.rest, $.hold, $._expression)),
+      optional(choice(
+        field('flags', $.step_flags),
+        seq('@', optional(field('velocity', $._expression))),
+      )),
+      optional(field('hold', $.hold)),
     )),
 
     rest: _ => '_',
+
+    // After a step, it holds its notes into the next; as a step, it goes on
+    // with the notes before.
+    hold: _ => '~',
+
+    // `@v.5p1rt.3`: letters, each group sharing the value after it.
+    step_flags: $ => seq('@', repeat1($.flag)),
+
+    flag: $ => seq(field('name', $.flag_name), field('value', $.flag_value)),
+
+    flag_value: _ => token.immediate(/\d[\d_]*(\.\d[\d_]*)?|\.\d[\d_]*/),
 
     event_parameters: $ => seq('(', repeat(choice($.identifier, ',')), ')'),
 

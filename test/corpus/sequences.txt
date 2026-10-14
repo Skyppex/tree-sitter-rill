@@ -253,3 +253,55 @@ halt(1)
         (argument
           (number
             (integer)))))))
+
+================================================================================
+Held notes and step flags
+================================================================================
+
+seq acid(step: 1/16) {
+  C2~, C3@v1~, ~, ~@p.6rt.3~, G2@vel, A2@0.5,
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (sequence_declaration
+    (identifier)
+    (settings
+      (setting
+        (identifier)
+        (binary_expression
+          (number
+            (integer))
+          (number
+            (integer)))))
+    (steps
+      (step
+        (identifier)
+        (hold))
+      (step
+        (identifier)
+        (step_flags
+          (flag
+            (flag_name)
+            (flag_value)))
+        (hold))
+      (step
+        (hold))
+      (step
+        (hold)
+        (step_flags
+          (flag
+            (flag_name)
+            (flag_value))
+          (flag
+            (flag_name)
+            (flag_value)))
+        (hold))
+      (step
+        (identifier)
+        (identifier))
+      (step
+        (identifier)
+        (number
+          (float))))))

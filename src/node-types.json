@@ -682,6 +682,32 @@
     }
   },
   {
+    "type": "flag",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "flag_name",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "flag_value",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "for_statement",
     "named": true,
     "fields": {
@@ -1634,12 +1660,36 @@
     "type": "step",
     "named": true,
     "fields": {
+      "flags": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "step_flags",
+            "named": true
+          }
+        ]
+      },
+      "hold": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "hold",
+            "named": true
+          }
+        ]
+      },
       "notes": {
         "multiple": false,
         "required": true,
         "types": [
           {
             "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "hold",
             "named": true
           },
           {
@@ -1658,6 +1708,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "step_flags",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "flag",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1921,6 +1986,14 @@
     "named": true
   },
   {
+    "type": "flag_name",
+    "named": true
+  },
+  {
+    "type": "flag_value",
+    "named": true
+  },
+  {
     "type": "float",
     "named": true
   },
@@ -1935,6 +2008,10 @@
   {
     "type": "halt",
     "named": false
+  },
+  {
+    "type": "hold",
+    "named": true
   },
   {
     "type": "identifier",

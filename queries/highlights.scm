@@ -98,6 +98,11 @@
 ] @keyword
 
 (rest) @punctuation.special
+(hold) @punctuation.special
+
+; `@v.5p1rt.3`: the letters say which values, the numbers what they are.
+(flag_name) @attribute
+(flag_value) @number
 
 "as" @keyword.operator
 

@@ -22,6 +22,10 @@
 //   the compiler, it is one only when sizes (names or numbers, with fields
 //   and arithmetic) separated by commas, a `>` and then `(` follow on the
 //   same line; otherwise `<` compares.
+// - `flag_name` is the letters of a step's flags, right after its `@` or
+//   the value before: `v` and `rt` in `G3@v.5rt.3`. Letters only count
+//   when one of `v`, `p`, `t` and `r` is followed by a number, so `@vel`
+//   is still a velocity read from a name.
 
 #include "tree_sitter/alloc.h"
 #include "tree_sitter/parser.h"
@@ -42,6 +46,7 @@ enum TokenType {
   RELEASE,
   SIZE_OPEN,
   EACH,
+  FLAG_NAME,
   ERROR_SENTINEL,
 };
 
@@ -241,6 +246,20 @@ static bool scan_size_open(TSLexer *lexer) {
   }
 }
 
+static bool is_flag_letter(int32_t c) { return c == 'v' || c == 'p' || c == 't' || c == 'r'; }
+
+static bool is_digit(int32_t c) { return c >= '0' && c <= '9'; }
+
+// The letters of a step flag, then a number (`5`, `.5`, `0.5`) right after,
+// which is left for the grammar.
+static bool scan_flag_name(TSLexer *lexer) {
+  if (!is_flag_letter(lexer->lookahead)) return false;
+  while (is_flag_letter(lexer->lookahead)) advance(lexer);
+  lexer->mark_end(lexer);
+  if (lexer->lookahead == '.') advance(lexer);
+  return is_digit(lexer->lookahead);
+}
+
 bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
   Scanner *scanner = payload;
   // During error recovery every symbol is valid; only comments are safe to
@@ -249,8 +268,10 @@ bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const
 
   bool newline = scanner->comment_had_newline;
   scanner->comment_had_newline = false;
+  bool spaced = false;
   while (is_space(lexer->lookahead)) {
     if (lexer->lookahead == '\n') newline = true;
+    spaced = true;
     skip(lexer);
   }
 
@@ -274,6 +295,13 @@ bool tree_sitter_rill_external_scanner_scan(void *payload, TSLexer *lexer, const
   }
 
   if (!valid_symbols[ERROR_SENTINEL]) {
+    if (valid_symbols[FLAG_NAME] && !spaced) {
+      lexer->result_symbol = FLAG_NAME;
+      if (scan_flag_name(lexer)) return true;
+      // Not flags: what was read is not taken, and the grammar reads it
+      // again as a velocity.
+      return false;
+    }
     if (valid_symbols[SIZE_OPEN] && !newline && lexer->lookahead == '<') {
       lexer->result_symbol = SIZE_OPEN;
       return scan_size_open(lexer);

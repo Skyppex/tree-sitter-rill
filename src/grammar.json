@@ -1111,6 +1111,10 @@
                 },
                 {
                   "type": "SYMBOL",
+                  "name": "hold"
+                },
+                {
+                  "type": "SYMBOL",
                   "name": "_expression"
                 }
               ]
@@ -1120,29 +1124,58 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "SEQ",
+                "type": "CHOICE",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": "@"
+                    "type": "FIELD",
+                    "name": "flags",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "step_flags"
+                    }
                   },
                   {
-                    "type": "CHOICE",
+                    "type": "SEQ",
                     "members": [
                       {
-                        "type": "FIELD",
-                        "name": "velocity",
-                        "content": {
-                          "type": "SYMBOL",
-                          "name": "_expression"
-                        }
+                        "type": "STRING",
+                        "value": "@"
                       },
                       {
-                        "type": "BLANK"
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "FIELD",
+                            "name": "velocity",
+                            "content": {
+                              "type": "SYMBOL",
+                              "name": "_expression"
+                            }
+                          },
+                          {
+                            "type": "BLANK"
+                          }
+                        ]
                       }
                     ]
                   }
                 ]
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "hold",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "hold"
+                }
               },
               {
                 "type": "BLANK"
@@ -1155,6 +1188,54 @@
     "rest": {
       "type": "STRING",
       "value": "_"
+    },
+    "hold": {
+      "type": "STRING",
+      "value": "~"
+    },
+    "step_flags": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "@"
+        },
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "flag"
+          }
+        }
+      ]
+    },
+    "flag": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "flag_name"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "flag_value"
+          }
+        }
+      ]
+    },
+    "flag_value": {
+      "type": "IMMEDIATE_TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "\\d[\\d_]*(\\.\\d[\\d_]*)?|\\.\\d[\\d_]*"
+      }
     },
     "event_parameters": {
       "type": "SEQ",
@@ -3333,6 +3414,10 @@
     {
       "type": "SYMBOL",
       "name": "_each"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "flag_name"
     },
     {
       "type": "SYMBOL",
