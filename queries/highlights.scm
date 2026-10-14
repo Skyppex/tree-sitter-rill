@@ -5,6 +5,9 @@
 ((identifier) @constant
   (#match? @constant "^[A-Z][A-Z0-9_]*$"))
 
+((identifier) @constant
+  (#match? @constant "^[A-G][#b]?[0-9]$"))
+
 (const_statement name: (identifier) @constant)
 
 (type_identifier) @type
