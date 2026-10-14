@@ -210,8 +210,9 @@ rill f(rate: f32) sample { return rate * RATE }
 Imports and exports
 ================================================================================
 
-import "lib/osc"
-export import "synth"
+import ./lib/osc
+export import ../synth
+import @gen/osc
 
 export const VOICES = 4
 export fn half(x: Float) Float { x / 2 }
@@ -223,10 +224,12 @@ export seq riff { C4 }
 
 (source_file
   (import_statement
-    (string))
+    (path))
   (export_statement
     (import_statement
-      (string)))
+      (path)))
+  (import_statement
+    (core_path))
   (export_statement
     (const_statement
       (identifier)
@@ -265,3 +268,42 @@ export seq riff { C4 }
       (steps
         (step
           (identifier))))))
+
+================================================================================
+Paths as values, beside division and fields
+================================================================================
+
+const KICK = ./drums/kick-2.wav
+const PAD = /samples/pad+1.flac
+const STEP = 1/16
+let x = a/b + note.pitch
+let y = ../up.wav
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (const_statement
+    (identifier)
+    (path))
+  (const_statement
+    (identifier)
+    (path))
+  (const_statement
+    (identifier)
+    (binary_expression
+      (number
+        (integer))
+      (number
+        (integer))))
+  (let_statement
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (field_expression
+        (identifier)
+        (field_identifier))))
+  (let_statement
+    (identifier)
+    (path)))

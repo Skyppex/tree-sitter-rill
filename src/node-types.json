@@ -64,6 +64,10 @@
         "named": true
       },
       {
+        "type": "path",
+        "named": true
+      },
+      {
         "type": "pipe_expression",
         "named": true
       },
@@ -1011,7 +1015,11 @@
         "required": false,
         "types": [
           {
-            "type": "string",
+            "type": "core_path",
+            "named": true
+          },
+          {
+            "type": "path",
             "named": true
           }
         ]
@@ -1958,6 +1966,10 @@
     "named": false
   },
   {
+    "type": "core_path",
+    "named": true
+  },
+  {
     "type": "each",
     "named": true
   },
@@ -2051,6 +2063,10 @@
     "named": false
   },
   {
+    "type": "path",
+    "named": true
+  },
+  {
     "type": "rate",
     "named": false
   },
@@ -2077,10 +2093,6 @@
   {
     "type": "state",
     "named": false
-  },
-  {
-    "type": "string",
-    "named": true
   },
   {
     "type": "trigger",

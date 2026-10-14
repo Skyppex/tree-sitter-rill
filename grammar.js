@@ -93,8 +93,12 @@ export default grammar({
 
     // ---- modules ----------------------------------------------------------
 
-    // `import "lib/osc"`: the path of another file, without `.rill`.
-    import_statement: $ => prec.right(seq('import', optional(field('path', $.string)))),
+    // `import ./lib/osc`: the path of another file, without `.rill`, or
+    // `import @gen/osc` for a module of the core library.
+    import_statement: $ => prec.right(seq(
+      'import',
+      optional(field('path', choice($.path, $.core_path))),
+    )),
 
     // `export` before a definition or an import makes it usable by files
     // that import this one.
@@ -110,7 +114,16 @@ export default grammar({
       ))),
     )),
 
-    string: _ => token(seq('"', /[^"\n]*/, '"')),
+    // `./lib/osc`, `../kick.wav`, `/abs/x.flac`: written as they are, as in
+    // Nix. Below `/` and `.` in precedence, so after a value they divide
+    // and read fields as before (`1/16`, `note.pitch`).
+    path: _ => token(prec(-1, choice(
+      /\.\.?\/[A-Za-z0-9_.+\-\/]*/,
+      /\/[A-Za-z0-9_.+\-\/]+/,
+    ))),
+
+    // `@gen/osc`, only after `import`.
+    core_path: _ => token(/@[A-Za-z][A-Za-z0-9_.+\-\/]*/),
 
     // ---- definitions ------------------------------------------------------
 
@@ -328,6 +341,7 @@ export default grammar({
 
     _expression: $ => choice(
       $.number,
+      $.path,
       $.boolean,
       $.identifier,
       $.unary_expression,

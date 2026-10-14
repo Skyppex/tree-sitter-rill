@@ -77,9 +77,8 @@
   "export"
 ] @keyword.import
 
-(string) @string
-
-(import_statement path: (string) @string.special.path)
+(path) @string.special.path
+(core_path) @string.special.path
 
 "return" @keyword.return
 
