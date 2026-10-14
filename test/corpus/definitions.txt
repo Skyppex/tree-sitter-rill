@@ -307,3 +307,59 @@ let y = ../up.wav
   (let_statement
     (identifier)
     (path)))
+
+================================================================================
+Audio types
+================================================================================
+
+fn twice<N>(a: Audio<N>, at: Time) [Sample; N] { read(a, at) * 2 }
+let x: Audio<1> = ./kick.wav
+let y: Audio = ./pad.flac
+let z = a < b
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (size_parameters
+      (identifier))
+    (parameters
+      (parameter
+        (identifier)
+        (sized_type
+          (type_identifier)
+          (identifier)))
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (frame_type
+      (type_identifier)
+      (identifier))
+    (block
+      (expression_statement
+        (binary_expression
+          (call_expression
+            (identifier)
+            (arguments
+              (argument
+                (identifier))
+              (argument
+                (identifier))))
+          (number
+            (integer))))))
+  (let_statement
+    (identifier)
+    (sized_type
+      (type_identifier)
+      (integer))
+    (path))
+  (let_statement
+    (identifier)
+    (type_identifier)
+    (path))
+  (let_statement
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier))))

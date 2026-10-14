@@ -14,7 +14,8 @@
 
 ((type_identifier) @type.builtin
   (#any-of? @type.builtin
-    "Sample" "Float" "Int" "Bool" "Freq" "Pitch" "Time" "Interval" "Gain"))
+    "Sample" "Float" "Int" "Bool" "Freq" "Pitch" "Time" "Interval" "Gain"
+    "Slope" "Audio"))
 
 (size_parameters (identifier) @type.parameter)
 (size_arguments (identifier) @type.parameter)
@@ -141,6 +142,7 @@
 
 (size_parameters ["<" ">"] @punctuation.bracket)
 (size_arguments ["<" ">"] @punctuation.bracket)
+(sized_type ["<" ">"] @punctuation.bracket)
 
 [
   "("

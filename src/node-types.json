@@ -164,6 +164,10 @@
         "named": true
       },
       {
+        "type": "sized_type",
+        "named": true
+      },
+      {
         "type": "type_identifier",
         "named": true
       }
@@ -1610,6 +1614,44 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "sized_type",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type_identifier",
+            "named": true
+          }
+        ]
+      },
+      "size": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "field_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "integer",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {

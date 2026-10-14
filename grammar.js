@@ -275,9 +275,18 @@ export default grammar({
 
     _type: $ => choice(
       alias($.identifier, $.type_identifier),
+      $.sized_type,
       $.frame_type,
       $.function_type,
     ),
+
+    // `Audio<2>`: a type with a size, as an audio file's channels.
+    sized_type: $ => prec(1, seq(
+      field('name', alias($.identifier, $.type_identifier)),
+      '<',
+      optional(field('size', $._size)),
+      '>',
+    )),
 
     // `fn(Pitch) Freq`, or `rill(Freq) Sample`
     function_type: $ => prec.right(seq(
