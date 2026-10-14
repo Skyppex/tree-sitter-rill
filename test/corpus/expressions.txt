@@ -83,6 +83,39 @@ fn f() f32 {
               (integer))))))))
 
 ================================================================================
+Floats without a leading zero
+================================================================================
+
+fn f() f32 { [.5, -.25, .5Hz, x.y, 0..5] }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (parameters)
+    (type_identifier)
+    (block
+      (expression_statement
+        (frame
+          (number
+            (float))
+          (unary_expression
+            (number
+              (float)))
+          (number
+            (float)
+            (unit))
+          (field_expression
+            (identifier)
+            (field_identifier))
+          (range_expression
+            (number
+              (integer))
+            (number
+              (integer))))))))
+
+================================================================================
 Unary, index and calls
 ================================================================================
 

@@ -526,7 +526,7 @@ export default grammar({
       )),
     )),
 
-    // `440Hz`, `0.5`, `48_000`, `1e-3`, `300ms`
+    // `440Hz`, `0.5`, `.5`, `48_000`, `1e-3`, `300ms`
     number: $ => seq(
       field('value', choice($.integer, $.float)),
       optional(field('unit', $.unit)),
@@ -536,6 +536,7 @@ export default grammar({
 
     float: _ => token(choice(
       /\d[\d_]*\.\d[\d_]*([eE][+-]?\d[\d_]*)?/,
+      /\.\d[\d_]*([eE][+-]?\d[\d_]*)?/,
       /\d[\d_]*[eE][+-]?\d[\d_]*/,
     )),
 
