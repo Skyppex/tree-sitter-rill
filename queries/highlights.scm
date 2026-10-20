@@ -15,7 +15,7 @@
 ((type_identifier) @type.builtin
   (#any-of? @type.builtin
     "Sample" "Float" "Int" "Bool" "Freq" "Pitch" "Time" "Interval" "Gain"
-    "Slope" "Audio" "Image"))
+    "Slope" "Audio"))
 
 (size_parameters (identifier) @type.parameter)
 (size_arguments (identifier) @type.parameter)
